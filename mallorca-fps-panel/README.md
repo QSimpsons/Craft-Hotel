@@ -1,36 +1,27 @@
-# Mallorca FPS Panel
+# Mallorca FPS
 
-FiveM NUI-balk bovenin het scherm met **8 slots**. Het Mallorca-wapen zit **in het midden**, tussen de twee groepen. Er is **geen CPU-meter**.
+FiveM-menu met **8 graphics-presets**. Er is **geen CPU-optie**.
 
-## De 8 onderdelen
+Open met `F7` of `/fps`. Klik een kaart; de keuze wordt automatisch opgeslagen. `ESC` of het kruis sluit het menu.
 
-| Positie | Slot |
-| --- | --- |
-| Links | FPS |
-| Links | Ping |
-| Links | ID |
-| Links | Spelers |
-| **Midden** | **Mallorca-crest** |
-| Rechts | Tijd |
-| Rechts | Stem |
-| Rechts | Discord |
+## Presets
+
+| # | Naam | Wat het doet |
+| --- | --- | --- |
+| 01 | Kwaliteit | Volledig detail en alle effecten |
+| 02 | Lichte boost | Iets minder detail veraf |
+| 03 | Licht gebalanceerd | Meer detail dan Gebalanceerd |
+| 04 | Gebalanceerd | Balans tussen beeld en prestaties |
+| 05 | Prestaties | Minder detail, verre voertuiglichten uit |
+| 06 | Extra prestaties | Minder detail; decals blijven zichtbaar |
+| 07 | Hoge FPS | Nog minder detail op afstand |
+| 08 | Maximale FPS | Laagste detail; decals uit |
 
 ## Installatie
 
-1. Zet de map `mallorca-fps-panel` in `resources`.
-2. Voeg toe aan `server.cfg`:
+1. Zet `mallorca-fps-panel` in `resources`.
+2. In `server.cfg`: `ensure mallorca-fps-panel`
 
-```
-ensure mallorca-fps-panel
-```
+## Demo
 
-3. Pas namen en Discord aan in `config.lua`.
-
-## Bediening
-
-- `F7` of `/fps` zet het panel aan of uit.
-- Stem volgt `pma-voice` of SaltyChat als die resource draait; anders blijft het op `Normaal`.
-
-## Demo in de browser
-
-Open `mallorca-fps-panel/html/index.html` in een browser. Buiten FiveM start automatisch een Mallorca-demo met live FPS/ping-schommeling.
+Open `mallorca-fps-panel/html/index.html` in een browser.

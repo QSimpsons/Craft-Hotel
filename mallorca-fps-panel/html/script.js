@@ -1,134 +1,120 @@
 const isFiveM = typeof GetParentResourceName === 'function';
 
-const els = {
-  hud: document.getElementById('hud'),
-  fps: document.getElementById('val-fps'),
-  ping: document.getElementById('val-ping'),
-  id: document.getElementById('val-id'),
-  players: document.getElementById('val-players'),
-  time: document.getElementById('val-time'),
-  voice: document.getElementById('val-voice'),
-  discord: document.getElementById('val-discord'),
-  server: document.getElementById('val-server'),
-  tagline: document.getElementById('val-tagline'),
-  fpsCard: document.querySelector('[data-key="fps"]'),
-  pingCard: document.querySelector('[data-key="ping"]')
-};
+const DEFAULT_PRESETS = [
+  { id: 1, title: 'Kwaliteit', description: 'Volledig detail en alle effecten.' },
+  { id: 2, title: 'Lichte boost', description: 'Een kleine stap minder detail veraf.' },
+  { id: 3, title: 'Licht gebalanceerd', description: 'Meer detail dan Gebalanceerd.' },
+  { id: 4, title: 'Gebalanceerd', description: 'Balans tussen beeld en prestaties.' },
+  { id: 5, title: 'Prestaties', description: 'Minder detail en verre voertuiglichten.' },
+  { id: 6, title: 'Extra prestaties', description: 'Minder detail; decals blijven zichtbaar.' },
+  { id: 7, title: 'Hoge FPS', description: 'Nog minder detail op afstand.' },
+  { id: 8, title: 'Maximale FPS', description: 'Laagste detail; decals uit.' }
+];
 
-function pad(value) {
-  return String(value).padStart(2, '0');
+const overlay = document.getElementById('overlay');
+const grid = document.getElementById('grid');
+const closeBtn = document.getElementById('btn-close');
+
+let selectedId = 1;
+let presets = DEFAULT_PRESETS;
+
+function resourceName() {
+  return GetParentResourceName();
 }
 
-function clockText(date) {
-  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+function pad(id) {
+  return String(id).padStart(2, '0');
 }
 
-function toneForFps(fps) {
-  if (fps >= 80) return 'ok';
-  if (fps >= 50) return 'warn';
-  return 'hot';
+function render() {
+  grid.innerHTML = presets.map((preset) => {
+    const active = preset.id === selectedId ? ' is-active' : '';
+    return `
+      <button class="card${active}" type="button" role="radio" aria-checked="${preset.id === selectedId}" data-id="${preset.id}">
+        <span class="card-index">${pad(preset.id)}</span>
+        <span class="card-radio" aria-hidden="true"></span>
+        <h2>${preset.title}</h2>
+        <p>${preset.description}</p>
+      </button>
+    `;
+  }).join('');
 }
 
-function toneForPing(ping) {
-  if (ping <= 50) return 'ok';
-  if (ping <= 100) return 'warn';
-  return 'hot';
+function setOpen(open) {
+  overlay.classList.toggle('is-open', open);
+  document.body.classList.toggle('menu-open', open);
 }
 
-function render(state) {
-  if (typeof state.fps === 'number') {
-    els.fps.textContent = String(state.fps);
-    els.fpsCard.dataset.tone = toneForFps(state.fps);
+function closeMenu() {
+  setOpen(false);
+  if (isFiveM) {
+    fetch(`https://${resourceName()}/close`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: '{}'
+    });
   }
-
-  if (typeof state.ping === 'number') {
-    els.ping.innerHTML = `${state.ping}<span class="unit">ms</span>`;
-    els.pingCard.dataset.tone = toneForPing(state.ping);
-  }
-
-  if (state.id !== undefined) {
-    els.id.textContent = String(state.id);
-  }
-
-  if (typeof state.players === 'number') {
-    const max = state.maxPlayers || 128;
-    els.players.innerHTML = `${state.players}<span class="unit">/${max}</span>`;
-  }
-
-  if (state.voice) {
-    els.voice.textContent = state.voice;
-  }
-
-  if (state.discord) {
-    els.discord.textContent = state.discord;
-    els.discord.setAttribute('title', state.discord);
-  }
-
-  if (state.serverName) {
-    els.server.textContent = state.serverName;
-  }
-
-  if (state.tagline) {
-    els.tagline.textContent = state.tagline;
-  }
-
-  els.time.textContent = clockText(new Date());
 }
 
-window.addEventListener('message', (event) => {
-  const data = event.data || {};
+function selectPreset(id) {
+  selectedId = id;
+  render();
+  if (isFiveM) {
+    fetch(`https://${resourceName()}/select`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+      body: JSON.stringify({ id })
+    });
+  } else {
+    localStorage.setItem('mallorca_fps_preset', String(id));
+  }
+}
 
-  if (data.action === 'toggle') {
-    els.hud.classList.toggle('is-hidden', data.show === false);
+grid.addEventListener('click', (event) => {
+  const card = event.target.closest('.card');
+  if (!card) {
     return;
   }
+  selectPreset(Number(card.dataset.id));
+});
 
-  if (data.action === 'init' || data.action === 'update') {
-    render(data);
+closeBtn.addEventListener('click', closeMenu);
+
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && overlay.classList.contains('is-open')) {
+    event.preventDefault();
+    closeMenu();
+  }
+
+  if (!isFiveM && (event.key === 'F7') && !overlay.classList.contains('is-open')) {
+    event.preventDefault();
+    setOpen(true);
   }
 });
 
-function startDemo() {
-  document.body.classList.add('demo');
-
-  const voices = ['Fluisteren', 'Normaal', 'Schreeuwen'];
-  const state = {
-    fps: 144,
-    ping: 24,
-    id: 12,
-    players: 48,
-    maxPlayers: 128,
-    voice: 'Normaal',
-    discord: 'discord.gg/mallorca',
-    serverName: 'Mallorca',
-    tagline: 'Islas Baleares'
-  };
-
-  render(state);
-
-  setInterval(() => {
-    const swing = Math.round((Math.random() - 0.45) * 10);
-    state.fps = Math.max(42, Math.min(165, state.fps + swing));
-    state.ping = Math.max(12, Math.min(140, state.ping + Math.round((Math.random() - 0.5) * 8)));
-    if (Math.random() < 0.12) {
-      state.players = Math.max(12, Math.min(128, state.players + (Math.random() > 0.5 ? 1 : -1)));
+window.addEventListener('message', (event) => {
+  const data = event.data || {};
+  if (data.action === 'open') {
+    if (Array.isArray(data.presets) && data.presets.length) {
+      presets = data.presets;
     }
-    if (Math.random() < 0.08) {
-      state.voice = voices[Math.floor(Math.random() * voices.length)];
-    }
-    render(state);
-  }, 700);
-
-  window.addEventListener('keydown', (event) => {
-    if (event.key === 'F7') {
-      event.preventDefault();
-      els.hud.classList.toggle('is-hidden');
-    }
-  });
-}
+    selectedId = Number(data.selected) || selectedId;
+    render();
+    setOpen(true);
+  }
+  if (data.action === 'close') {
+    setOpen(false);
+  }
+});
 
 if (!isFiveM) {
-  startDemo();
+  document.body.classList.add('demo');
+  const saved = Number(localStorage.getItem('mallorca_fps_preset'));
+  if (saved >= 1 && saved <= 8) {
+    selectedId = saved;
+  }
+  render();
+  setOpen(true);
 } else {
-  render({ fps: 0, ping: 0, id: 0, players: 0, maxPlayers: 128, voice: 'Normaal' });
+  setOpen(false);
 }

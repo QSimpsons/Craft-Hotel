@@ -1,18 +1,153 @@
 Config = {}
 
--- Display name in the center crest (the piece that sits between the two groups)
-Config.ServerName = 'Mallorca'
-Config.Tagline = 'Islas Baleares'
-
--- Shown in the Discord slot. No CPU meter is included on purpose.
-Config.Discord = 'discord.gg/mallorca'
-
--- Fallback if sv_maxclients is not set
-Config.MaxPlayers = 128
-
--- /fps and this keybind toggle the panel
 Config.Command = 'fps'
 Config.ToggleKey = 'F7'
+Config.DefaultPreset = 1
 
--- How often the NUI receives fresh FPS / ping / id (ms)
-Config.UpdateInterval = 400
+-- Eight graphics presets. No CPU option on purpose.
+Config.Presets = {
+    {
+        id = 1,
+        title = 'Kwaliteit',
+        description = 'Volledig detail en alle effecten.',
+        shadowScale = 5.0,
+        trackerScale = 5.0,
+        depthValue = 5.0,
+        lightDistance = 10.0,
+        lodScale = 1.0,
+        distantLights = true,
+        sirens = true,
+        aircraftShadows = true,
+        entityTracker = true,
+        dynamicDepth = true,
+        ropeShadows = true,
+        decals = true,
+        occlusion = true
+    },
+    {
+        id = 2,
+        title = 'Lichte boost',
+        description = 'Een kleine stap minder detail veraf.',
+        shadowScale = 4.0,
+        trackerScale = 4.0,
+        depthValue = 4.0,
+        lightDistance = 8.0,
+        lodScale = 0.92,
+        distantLights = true,
+        sirens = true,
+        aircraftShadows = true,
+        entityTracker = true,
+        dynamicDepth = true,
+        ropeShadows = true,
+        decals = true,
+        occlusion = true
+    },
+    {
+        id = 3,
+        title = 'Licht gebalanceerd',
+        description = 'Meer detail dan Gebalanceerd.',
+        shadowScale = 3.0,
+        trackerScale = 3.0,
+        depthValue = 3.0,
+        lightDistance = 6.5,
+        lodScale = 0.84,
+        distantLights = true,
+        sirens = true,
+        aircraftShadows = false,
+        entityTracker = true,
+        dynamicDepth = true,
+        ropeShadows = true,
+        decals = true,
+        occlusion = true
+    },
+    {
+        id = 4,
+        title = 'Gebalanceerd',
+        description = 'Balans tussen beeld en prestaties.',
+        shadowScale = 2.2,
+        trackerScale = 2.0,
+        depthValue = 2.0,
+        lightDistance = 5.0,
+        lodScale = 0.76,
+        distantLights = true,
+        sirens = false,
+        aircraftShadows = false,
+        entityTracker = true,
+        dynamicDepth = false,
+        ropeShadows = true,
+        decals = true,
+        occlusion = true
+    },
+    {
+        id = 5,
+        title = 'Prestaties',
+        description = 'Minder detail en verre voertuiglichten.',
+        shadowScale = 1.2,
+        trackerScale = 1.0,
+        depthValue = 1.0,
+        lightDistance = 3.0,
+        lodScale = 0.64,
+        distantLights = false,
+        sirens = false,
+        aircraftShadows = false,
+        entityTracker = false,
+        dynamicDepth = false,
+        ropeShadows = false,
+        decals = true,
+        occlusion = true
+    },
+    {
+        id = 6,
+        title = 'Extra prestaties',
+        description = 'Minder detail; decals blijven zichtbaar.',
+        shadowScale = 0.6,
+        trackerScale = 0.4,
+        depthValue = 0.4,
+        lightDistance = 1.8,
+        lodScale = 0.52,
+        distantLights = false,
+        sirens = false,
+        aircraftShadows = false,
+        entityTracker = false,
+        dynamicDepth = false,
+        ropeShadows = false,
+        decals = true,
+        occlusion = false
+    },
+    {
+        id = 7,
+        title = 'Hoge FPS',
+        description = 'Nog minder detail op afstand.',
+        shadowScale = 0.2,
+        trackerScale = 0.0,
+        depthValue = 0.0,
+        lightDistance = 0.8,
+        lodScale = 0.4,
+        distantLights = false,
+        sirens = false,
+        aircraftShadows = false,
+        entityTracker = false,
+        dynamicDepth = false,
+        ropeShadows = false,
+        decals = true,
+        occlusion = false
+    },
+    {
+        id = 8,
+        title = 'Maximale FPS',
+        description = 'Laagste detail; decals uit.',
+        shadowScale = 0.0,
+        trackerScale = 0.0,
+        depthValue = 0.0,
+        lightDistance = 0.0,
+        lodScale = 0.3,
+        distantLights = false,
+        sirens = false,
+        aircraftShadows = false,
+        entityTracker = false,
+        dynamicDepth = false,
+        ropeShadows = false,
+        decals = false,
+        occlusion = false
+    }
+}

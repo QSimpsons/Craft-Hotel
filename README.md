@@ -1,5 +1,5 @@
 # GianniJ
 
-Mallorca FPS panel voor FiveM: acht slots, crest in het midden, geen CPU.
+Mallorca FPS-menu: acht graphics-presets, geen CPU.
 
 Resource: [`mallorca-fps-panel`](mallorca-fps-panel/README.md)
