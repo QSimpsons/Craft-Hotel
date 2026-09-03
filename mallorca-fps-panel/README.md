@@ -1,8 +1,12 @@
 # Mallorca FPS
 
-FiveM-menu met **8 graphics-presets**. Er is **geen CPU-optie**.
+Alles zit in **één bestand**: [`mallorca-fps.html`](../mallorca-fps.html)
 
-Open met `F7` of `/fps`. Klik een kaart; de keuze wordt automatisch opgeslagen. `ESC` of het kruis sluit het menu.
+Open dat bestand in je browser, of gebruik het als FiveM NUI (`html/index.html` is hetzelfde bestand). Acht graphics-presets, geen CPU.
+
+- `F7` of `/fps` opent het menu
+- Klik een kaart; de keuze wordt automatisch opgeslagen
+- `ESC` of het kruis sluit
 
 ## Presets
 
@@ -17,11 +21,7 @@ Open met `F7` of `/fps`. Klik een kaart; de keuze wordt automatisch opgeslagen. 
 | 07 | Hoge FPS | Nog minder detail op afstand |
 | 08 | Maximale FPS | Laagste detail; decals uit |
 
-## Installatie
+## FiveM
 
-1. Zet `mallorca-fps-panel` in `resources`.
+1. Zet `mallorca-fps-panel` in `resources`
 2. In `server.cfg`: `ensure mallorca-fps-panel`
-
-## Demo
-
-Open `mallorca-fps-panel/html/index.html` in een browser.

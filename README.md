@@ -1,5 +1,5 @@
 # GianniJ
 
-Mallorca FPS-menu: acht graphics-presets, geen CPU.
+Mallorca FPS-menu in één bestand: [`mallorca-fps.html`](mallorca-fps.html)
 
-Resource: [`mallorca-fps-panel`](mallorca-fps-panel/README.md)
+Acht graphics-presets, geen CPU. FiveM-resource: [`mallorca-fps-panel`](mallorca-fps-panel/README.md)
