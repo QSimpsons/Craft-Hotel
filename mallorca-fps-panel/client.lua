@@ -69,14 +69,10 @@ local function openMenu()
 end
 
 RegisterCommand(Config.Command, function()
-    if menuOpen then
-        closeMenu()
-    else
-        openMenu()
-    end
+    openMenu()
 end, false)
 
-RegisterKeyMapping(Config.Command, 'Mallorca FPS menu', 'keyboard', Config.ToggleKey)
+TriggerEvent('chat:addSuggestion', '/' .. Config.Command, 'Open het Mallorca FPS menu')
 
 RegisterNUICallback('select', function(data, cb)
     local id = tonumber(data and data.id)

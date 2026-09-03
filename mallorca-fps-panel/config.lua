@@ -1,7 +1,6 @@
 Config = {}
 
 Config.Command = 'fps'
-Config.ToggleKey = 'F7'
 Config.DefaultPreset = 1
 
 -- Eight graphics presets. No CPU option on purpose.

@@ -4,7 +4,7 @@ Alles zit in **één bestand**: [`mallorca-fps.html`](../mallorca-fps.html)
 
 Open dat bestand in je browser, of gebruik het als FiveM NUI (`html/index.html` is hetzelfde bestand). Acht graphics-presets, geen CPU.
 
-- `F7` of `/fps` opent het menu
+- `/fps` in de chat opent het menu
 - Klik een kaart; de keuze wordt automatisch opgeslagen
 - `ESC` of het kruis sluit
 
