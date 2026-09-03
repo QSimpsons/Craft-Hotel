@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mallorca FPS</title>
+  <style>
+    :root {
+      --orange: #ff7a1a;
+      --text: #f3f3f3;
+      --muted: #b9b9b9;
+      --dim: #8d8d8d;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      color: var(--text);
+      font-family: Inter, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body.demo { background: #0b0b0b; }
+
+    .scene {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      filter: blur(7px) saturate(1.15);
+      transform: scale(1.08);
+    }
+
+    body.demo .scene { display: block; }
+
+    .sky {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, #7ec8e8 0%, #cfe7a8 42%, #e7d39a 70%, #d9b36a 100%);
+    }
+
+    .sun {
+      position: absolute;
+      top: 8%;
+      right: 18%;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #ffe27a;
+      box-shadow: 0 0 80px 30px rgba(255, 210, 80, 0.55);
+    }
+
+    .building {
+      position: absolute;
+      bottom: 28%;
+      background: linear-gradient(180deg, #c9b08a, #8d6a4a);
+    }
+
+    .b1 { left: 6%; width: 18%; height: 34%; }
+    .b2 { left: 28%; width: 22%; height: 46%; }
+    .b3 { right: 12%; width: 26%; height: 40%; }
+
+    .road {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 28%;
+      background:
+        repeating-linear-gradient(90deg, #f2ead2 0 42px, transparent 42px 78px),
+        #5a5a5a;
+      background-blend-mode: overlay;
+    }
+
+    .palm {
+      position: absolute;
+      bottom: 26%;
+      width: 12px;
+      height: 160px;
+      background: #3d2a18;
+    }
+
+    .palm::before {
+      content: '';
+      position: absolute;
+      top: -18px;
+      left: -62px;
+      width: 140px;
+      height: 90px;
+      background:
+        radial-gradient(ellipse at 20% 80%, #1f7a3a 0 26%, transparent 28%),
+        radial-gradient(ellipse at 55% 20%, #2d9448 0 28%, transparent 30%),
+        radial-gradient(ellipse at 82% 72%, #176332 0 24%, transparent 26%);
+    }
+
+    .p1 { left: 16%; }
+    .p2 { right: 22%; height: 190px; }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      place-items: center;
+      background: rgba(0, 0, 0, 0.18);
+    }
+
+    .overlay.is-open { display: grid; }
+
+    .panel {
+      position: relative;
+      width: min(800px, calc(100vw - 32px));
+      padding: 30px 30px 16px;
+      border-radius: 16px;
+      background: rgba(16, 16, 16, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+
+    .close svg { width: 18px; height: 18px; fill: currentColor; }
+
+    .head { text-align: center; margin: 6px 0 20px; }
+
+    .head h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .head h1 .brand { color: var(--orange); }
+    .head h1 .fps { color: #fff; }
+
+    .head p {
+      margin-top: 8px;
+      font-size: 14px;
+      color: #ececec;
+      font-weight: 500;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .card {
+      position: relative;
+      text-align: left;
+      padding: 14px 16px 16px;
+      min-height: 96px;
+      border-radius: 8px;
+      border: 1px solid #2c2c2c;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .card:hover { border-color: #5a5a5a; }
+
+    .card.is-active {
+      border-color: var(--orange);
+      box-shadow: inset 0 0 0 1px var(--orange);
+    }
+
+    .card-index {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #ececec;
+      letter-spacing: 0.04em;
+    }
+
+    .card.is-active .card-index { color: var(--orange); }
+
+    .card-radio {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #d7d7d7;
+      border-radius: 50%;
+      background: transparent;
+    }
+
+    .card.is-active .card-radio { border-color: var(--orange); }
+
+    .card.is-active .card-radio::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .card h2 { margin-top: 10px; font-size: 16px; font-weight: 700; }
+
+    .card p {
+      margin-top: 4px;
+      font-size: 13px;
+      line-height: 1.35;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .note {
+      margin-top: 18px;
+      font-size: 12px;
+      line-height: 1.45;
+      color: var(--dim);
+    }
+
+    .foot {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #2f2f2f;
+      font-size: 12px;
+      color: #d8d8d8;
+    }
+
+    .foot strong { font-weight: 800; }
+
+    .chat {
+      display: none;
+      position: fixed;
+      left: 24px;
+      bottom: 24px;
+      z-index: 5;
+      width: min(420px, calc(100vw - 48px));
+    }
+
+    body.demo:not(.menu-open) .chat { display: flex; flex-direction: column; gap: 8px; }
+
+    .chat .hint {
+      font-size: 12px;
+      color: #d0d0d0;
+    }
+
+    .chat input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 0;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.78);
+      color: #fff;
+      font: 15px Inter, 'Segoe UI', sans-serif;
+      outline: none;
+    }
+
+    kbd {
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--orange);
+      font-family: inherit;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" aria-hidden="true">
+    <div class="sky"></div>
+    <div class="sun"></div>
+    <div class="building b1"></div>
+    <div class="building b2"></div>
+    <div class="building b3"></div>
+    <div class="road"></div>
+    <div class="palm p1"></div>
+    <div class="palm p2"></div>
+  </div>
+
+  <div class="overlay" id="overlay">
+    <section class="panel" role="dialog" aria-modal="true" aria-labelledby="fps-title">
+      <button class="close" id="btn-close" type="button" aria-label="Sluiten">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6z"/></svg>
+      </button>
+
+      <header class="head">
+        <h1 id="fps-title"><span class="brand">Mallorca</span> <span class="fps">FPS</span></h1>
+        <p>Kies jouw balans tussen beeld en prestaties.</p>
+      </header>
+
+      <div class="grid" id="grid" role="radiogroup" aria-label="FPS presets"></div>
+
+      <p class="note">
+        Meer prestaties kan minder beelddetail betekenen.<br />
+        De FPS-winst verschilt per pc en server.
+      </p>
+
+      <footer class="foot">
+        <span>Keuze wordt automatisch opgeslagen</span>
+        <span><strong>ESC</strong> om te sluiten</span>
+      </footer>
+    </section>
+  </div>
+
+  <form class="chat" id="chat" autocomplete="off">
+    <p class="hint">Typ <kbd>/fps</kbd> en druk op Enter om het menu te openen</p>
+    <input id="chat-input" type="text" name="chat" placeholder="/fps" spellcheck="false" />
+  </form>
+
+  <script>
+    const isFiveM = typeof GetParentResourceName === 'function';
+
+    const PRESETS = [
+      { id: 1, title: 'Kwaliteit', description: 'Volledig detail en alle effecten.' },
+      { id: 2, title: 'Lichte boost', description: 'Een kleine stap minder detail veraf.' },
+      { id: 3, title: 'Licht gebalanceerd', description: 'Meer detail dan Gebalanceerd.' },
+      { id: 4, title: 'Gebalanceerd', description: 'Balans tussen beeld en prestaties.' },
+      { id: 5, title: 'Prestaties', description: 'Minder detail en verre voertuiglichten.' },
+      { id: 6, title: 'Extra prestaties', description: 'Minder detail; decals blijven zichtbaar.' },
+      { id: 7, title: 'Hoge FPS', description: 'Nog minder detail op afstand.' },
+      { id: 8, title: 'Maximale FPS', description: 'Laagste detail; decals uit.' }
+    ];
+
+    const overlay = document.getElementById('overlay');
+    const grid = document.getElementById('grid');
+    const closeBtn = document.getElementById('btn-close');
+
+    let selectedId = 1;
+    let presets = PRESETS;
+
+    function pad(id) {
+      return String(id).padStart(2, '0');
+    }
+
+    function render() {
+      grid.innerHTML = presets.map((preset) => {
+        const active = preset.id === selectedId ? ' is-active' : '';
+        return (
+          '<button class="card' + active + '" type="button" role="radio" aria-checked="' +
+          (preset.id === selectedId) + '" data-id="' + preset.id + '">' +
+          '<span class="card-index">' + pad(preset.id) + '</span>' +
+          '<span class="card-radio" aria-hidden="true"></span>' +
+          '<h2>' + preset.title + '</h2>' +
+          '<p>' + preset.description + '</p>' +
+          '</button>'
+        );
+      }).join('');
+    }
+
+    function setOpen(open) {
+      overlay.classList.toggle('is-open', open);
+      document.body.classList.toggle('menu-open', open);
+    }
+
+    function closeMenu() {
+      setOpen(false);
+      if (isFiveM) {
+        fetch('https://' + GetParentResourceName() + '/close', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+          body: '{}'
+        });
+      }
+    }
+
+    function selectPreset(id) {
+      selectedId = id;
+      render();
+      if (isFiveM) {
+        fetch('https://' + GetParentResourceName() + '/select', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+          body: JSON.stringify({ id: id })
+        });
+      } else {
+        localStorage.setItem('mallorca_fps_preset', String(id));
+      }
+    }
+
+    grid.addEventListener('click', function (event) {
+      const card = event.target.closest('.card');
+      if (!card) return;
+      selectPreset(Number(card.dataset.id));
+    });
+
+    closeBtn.addEventListener('click', closeMenu);
+
+    function tryOpenFromChat(value) {
+      const command = String(value || '').trim().toLowerCase();
+      if (command === '/fps' || command === 'fps') {
+        setOpen(true);
+        return true;
+      }
+      return false;
+    }
+
+    window.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && overlay.classList.contains('is-open')) {
+        event.preventDefault();
+        closeMenu();
+      }
+    });
+
+    window.addEventListener('message', function (event) {
+      const data = event.data || {};
+      if (data.action === 'open') {
+        if (Array.isArray(data.presets) && data.presets.length) {
+          presets = data.presets;
+        }
+        selectedId = Number(data.selected) || selectedId;
+        render();
+        setOpen(true);
+      }
+      if (data.action === 'close') {
+        setOpen(false);
+      }
+    });
+
+    if (!isFiveM) {
+      document.body.classList.add('demo');
+      const saved = Number(localStorage.getItem('mallorca_fps_preset'));
+      if (saved >= 1 && saved <= 8) selectedId = saved;
+      render();
+      setOpen(false);
+
+      const chat = document.getElementById('chat');
+      const chatInput = document.getElementById('chat-input');
+      chat.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (tryOpenFromChat(chatInput.value)) {
+          chatInput.value = '';
+        }
+      });
+      chatInput.focus();
+    } else {
+      setOpen(false);
+    }
+  </script>
+</body>
+</html>
