@@ -120,11 +120,11 @@ body.demo .scene {
 
 .panel {
   position: relative;
-  width: min(760px, calc(100vw - 32px));
-  padding: 28px 28px 16px;
-  border-radius: 18px;
-  background: var(--panel);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  width: min(800px, calc(100vw - 32px));
+  padding: 30px 30px 16px;
+  border-radius: 16px;
+  background: rgba(16, 16, 16, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
 }
 
@@ -154,14 +154,18 @@ body.demo .scene {
 }
 
 .head h1 {
-  font-size: 30px;
+  font-size: 32px;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.head h1 span {
+.head h1 .brand {
   color: var(--orange);
+}
+
+.head h1 .fps {
+  color: #fff;
 }
 
 .head p {
@@ -181,9 +185,9 @@ body.demo .scene {
   position: relative;
   text-align: left;
   padding: 14px 16px 16px;
-  min-height: 92px;
-  border-radius: 10px;
-  border: 1px solid #3a3a3a;
+  min-height: 96px;
+  border-radius: 8px;
+  border: 1px solid #2c2c2c;
   background: transparent;
   color: inherit;
   cursor: pointer;
@@ -202,8 +206,8 @@ body.demo .scene {
 .card-index {
   display: block;
   font-size: 12px;
-  font-weight: 700;
-  color: #cfcfcf;
+  font-weight: 600;
+  color: #ececec;
   letter-spacing: 0.04em;
 }
 
