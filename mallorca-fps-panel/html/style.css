@@ -112,7 +112,7 @@ body.demo .scene {
   left: 50%;
   transform: translateX(-50%);
   z-index: 20;
-  width: min(1320px, calc(100vw - 32px));
+  width: min(1440px, calc(100vw - 24px));
   opacity: 1;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
@@ -202,7 +202,15 @@ body.demo .scene {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 148px;
+  max-width: 168px;
+}
+
+.stat[data-key='discord'] {
+  min-width: 196px;
+}
+
+.stat[data-key='discord'] .copy strong {
+  max-width: 220px;
 }
 
 .copy span {

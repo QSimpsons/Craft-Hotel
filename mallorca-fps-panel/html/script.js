@@ -61,6 +61,7 @@ function render(state) {
 
   if (state.discord) {
     els.discord.textContent = state.discord;
+    els.discord.setAttribute('title', state.discord);
   }
 
   if (state.serverName) {
