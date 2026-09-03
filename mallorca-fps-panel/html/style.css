@@ -1,0 +1,327 @@
+:root {
+  --ink: #f6efe2;
+  --muted: #c9b89a;
+  --gold: #e3bf6a;
+  --gold-deep: #b8862b;
+  --teal: #4fe0d2;
+  --sea: #14545c;
+  --night: rgba(8, 18, 22, 0.78);
+  --glass: rgba(16, 32, 38, 0.72);
+  --line: rgba(227, 191, 106, 0.55);
+  --warn: #e7b34d;
+  --hot: #e07a5f;
+  --ok: #5ee0c7;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  color: var(--ink);
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+}
+
+body.demo {
+  background: #071016;
+}
+
+.scene {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 70% 18%, #ffd18a 0 8%, transparent 28%),
+    linear-gradient(180deg, #1b3a4a 0%, #2f6d7a 38%, #1c4d58 58%, #0c2a32 100%);
+}
+
+body.demo .scene {
+  display: block;
+}
+
+.scene .sun {
+  position: absolute;
+  top: 11%;
+  right: 18%;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff4cc, #f0b94a 55%, #c77a22);
+  box-shadow: 0 0 80px 24px rgba(255, 196, 92, 0.45);
+}
+
+.scene .sea {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 46%;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(90, 214, 206, 0.16) 0 14px,
+      transparent 14px 28px
+    ),
+    linear-gradient(180deg, #2aa8a8 0%, #0e3d48 100%);
+}
+
+.scene .cliff {
+  position: absolute;
+  left: -6%;
+  bottom: 18%;
+  width: 52%;
+  height: 42%;
+  background: linear-gradient(160deg, #cbb89a 0%, #8a6a4a 70%, #5c4030 100%);
+  clip-path: polygon(0 42%, 18% 28%, 34% 36%, 48% 18%, 70% 32%, 100% 22%, 100% 100%, 0 100%);
+}
+
+.scene .palm {
+  position: absolute;
+  right: 12%;
+  bottom: 28%;
+  width: 10px;
+  height: 180px;
+  background: #3a2a1a;
+  border-radius: 8px;
+}
+
+.scene .palm::before {
+  content: '';
+  position: absolute;
+  top: -20px;
+  left: -70px;
+  width: 150px;
+  height: 90px;
+  background:
+    radial-gradient(ellipse at 20% 80%, #1f6b3a 0 28%, transparent 30%),
+    radial-gradient(ellipse at 50% 20%, #2d8a4a 0 30%, transparent 32%),
+    radial-gradient(ellipse at 80% 70%, #195c32 0 28%, transparent 30%);
+}
+
+.hud {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: min(1320px, calc(100vw - 32px));
+  opacity: 1;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.hud.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(-12px);
+}
+
+.rail {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+}
+
+.rail::before {
+  content: '';
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 50%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line) 18%, var(--line) 82%, transparent);
+  z-index: 0;
+}
+
+.group {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  z-index: 1;
+}
+
+.group.left {
+  justify-content: flex-end;
+}
+
+.group.right {
+  justify-content: flex-start;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 108px;
+  padding: 8px 12px;
+  background: var(--glass);
+  border: 1px solid rgba(227, 191, 106, 0.22);
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.stat .icon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(79, 224, 210, 0.12);
+  color: var(--teal);
+  flex-shrink: 0;
+}
+
+.stat .icon svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+  min-width: 0;
+}
+
+.copy strong {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 148px;
+}
+
+.copy span {
+  margin-top: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.unit {
+  margin-left: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0;
+}
+
+.stat[data-tone='ok'] .icon { color: var(--ok); background: rgba(94, 224, 199, 0.14); }
+.stat[data-tone='ok'] strong { color: var(--ok); }
+.stat[data-tone='warn'] .icon { color: var(--warn); background: rgba(231, 179, 77, 0.16); }
+.stat[data-tone='warn'] strong { color: var(--warn); }
+.stat[data-tone='hot'] .icon { color: var(--hot); background: rgba(224, 122, 95, 0.16); }
+.stat[data-tone='hot'] strong { color: var(--hot); }
+
+.crest {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 132px;
+  padding: 6px 16px 8px;
+  background: linear-gradient(180deg, rgba(22, 42, 48, 0.94), rgba(10, 24, 28, 0.94));
+  border: 1px solid rgba(243, 210, 122, 0.55);
+  border-radius: 22px;
+  box-shadow:
+    0 0 0 4px rgba(8, 16, 20, 0.45),
+    0 12px 28px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 236, 180, 0.25);
+}
+
+.crest-ring {
+  width: 46px;
+  height: 46px;
+  margin-top: -18px;
+  border-radius: 50%;
+  background: #10262c;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.35);
+}
+
+.crest-ring img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.crest-copy .name {
+  margin-top: 2px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.crest-copy .tag {
+  margin-top: 2px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hint {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--night);
+  border: 1px solid rgba(227, 191, 106, 0.25);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+body.demo .hint {
+  display: block;
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--gold);
+  font-family: inherit;
+  font-weight: 700;
+}
+
+@media (max-width: 1100px) {
+  .stat[data-key='discord'] .copy strong,
+  .stat[data-key='voice'] .copy strong {
+    max-width: 92px;
+  }
+
+  .group {
+    gap: 6px;
+  }
+
+  .stat {
+    min-width: 0;
+    padding: 8px 10px;
+  }
+}
