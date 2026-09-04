@@ -24,7 +24,7 @@ function sendAction(name, status = null) {
     }).catch(err => console.log("Fetch error: ", err));
 }
 
-const cards = ['btn-laag', 'btn-boost', 'btn-texturen', 'btn-nogpu', 'btn-grafics', 'btn-vignette', 'btn-zwartwit'];
+const cards = ['btn-laag', 'btn-boost', 'btn-texturen', 'btn-nogpu', 'btn-grafics', 'btn-vignette', 'btn-zwartwit', 'btn-schaduwen'];
 
 cards.forEach(id => {
     let element = document.getElementById(id);

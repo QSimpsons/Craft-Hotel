@@ -9,7 +9,8 @@ local actieveModifiers = {
     ["btn-nogpu"] = false,
     ["btn-grafics"] = false,
     ["btn-vignette"] = false,
-    ["btn-zwartwit"] = false
+    ["btn-zwartwit"] = false,
+    ["btn-schaduwen"] = false
 }
 
 -- FPS teller die op de achtergrond meedraait
@@ -53,6 +54,27 @@ local function ClearGameGarbage(ped)
     SetWindSpeed(0.0)
 end
 
+local function ApplyShadows(disabled)
+    if disabled then
+        RopeDrawShadowEnabled(false)
+        CascadeShadowsClearShadowSampleType()
+        CascadeShadowsSetAircraftMode(false)
+        CascadeShadowsEnableEntityTracker(true)
+        CascadeShadowsSetDynamicDepthMode(false)
+        CascadeShadowsSetEntityTrackerScale(0.0)
+        CascadeShadowsSetDynamicDepthValue(0.0)
+        CascadeShadowsSetCascadeBoundsScale(0.0)
+    else
+        RopeDrawShadowEnabled(true)
+        CascadeShadowsSetAircraftMode(true)
+        CascadeShadowsEnableEntityTracker(false)
+        CascadeShadowsSetDynamicDepthMode(true)
+        CascadeShadowsSetEntityTrackerScale(5.0)
+        CascadeShadowsSetDynamicDepthValue(5.0)
+        CascadeShadowsSetCascadeBoundsScale(1.0)
+    end
+end
+
 -- Functie die kijkt wat er allemaal aanstaat en dit combineert
 local function BerekenEnToepassenModifiers()
     local ped = PlayerPedId()
@@ -91,6 +113,8 @@ local function BerekenEnToepassenModifiers()
             SetTimecycleModifier('rply_vignette')
         end
     end
+
+    ApplyShadows(actieveModifiers["btn-schaduwen"])
 end
 
 -- Functie om alle gegevens te verzamelen en naar het menu te sturen
@@ -149,6 +173,7 @@ RegisterNUICallback('reset', function(data, cb)
     SetTimecycleModifier()
     ClearTimecycleModifier()
     ClearExtraTimecycleModifier()
+    ApplyShadows(false)
     cb('ok')
 end)
 
@@ -174,6 +199,18 @@ Citizen.CreateThread(function()
         Citizen.Wait(1000)
         if isMenuOpen then
             updateMenuStats()
+        end
+    end
+end)
+
+-- Schaduwen blijven uit zolang de knop aanstaat
+Citizen.CreateThread(function()
+    while true do
+        if actieveModifiers["btn-schaduwen"] then
+            ApplyShadows(true)
+            Citizen.Wait(0)
+        else
+            Citizen.Wait(500)
         end
     end
 end)
