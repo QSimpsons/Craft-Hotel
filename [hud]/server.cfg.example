@@ -1,0 +1,6 @@
+ensure oxmysql
+ensure es_extended
+ensure esx_lib
+ensure esx_status
+ensure esx_basicneeds
+ensure mallorca-hud

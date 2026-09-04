@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MrDeurmat | Basichud</title>
+
+    <script src="nui://game/ui/jquery.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script src="https://kit.fontawesome.com/41fadc0ef5.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body style="background: transparent !important;">
+    <div class="future-hud">
+        <!-- Icons like food & drink -->
+        <div class="future-needs">
+            <div class="future-need" data-needed="watermark">
+                <img src="img/logo.png" class="future-watermark">
+            </div>
+            <div class="future-need" data-needed="hunger">
+                <img src="img/hunger.png" class="future-need-img" style="filter: none !important;">
+            </div>
+            <div class="future-need" data-needed="thirst">
+                <img src="img/thirst.png" class="future-need-img">
+            </div>
+        </div>
+
+        <!-- Money shit -->
+        <div class="future-moneyconainer">
+            <div class="future-money-cat-bg"><img src="img/contant.png" class="future-money-cat"></div>
+            <div class="future-money-value" data-money="money">€0</div>
+
+            <div class="future-money-cat-bg"><img src="img/bank.png" class="future-money-cat"></div>
+            <div class="future-money-value" data-money="bank">€0</div>
+
+            <div class="future-money-cat-bg"><img src="img/zwartgeld.png" class="future-money-cat"></div>
+            <div class="future-money-value" data-money="black_money">€0</div>
+        </div>
+
+        <!-- Primary job -->
+        <div class="future-mainjob">
+            <div class="future-mainjob-bg"><img src="img/jobs/unemployed.png" class="future-mainjob-cat"></div>
+            <div class="future-mainjob-value" data-job="main">Zoeken...</div>
+        </div>
+
+        <!-- Second job -->
+        <div class="future-secondjob">
+            <div class="future-secondjob-bg"><img src="img/jobs/unemployed.png" class="future-secondjob-cat"></div>
+            <div class="future-secondjob-value" data-job="second">Zoeken...</div>
+        </div>
+        <div class="future-secondjob-new">
+            <div class="future-secondjob-bg"><img src="img/idcard.png" class="future-secondjob-cat-id"></div>
+            <div class="future-secondjob-value" data-job="idnum">1111</div>
+        </div>
+    </div>    
+    
+    <script src="index.js"></script>
+</body>
+</html>
