@@ -1,0 +1,252 @@
+@font-face {font-family: 'Montserrat-SemiBold'; src: url('fonts/Montserrat-SemiBold.ttf')}
+@font-face {font-family: 'Montserrat-Bold'; src: url('fonts/Montserrat-Bold.ttf')}
+
+:root {
+    /* Golvend oranje thema — Mallorca sunset */
+    --summer-panel: linear-gradient(120deg, rgba(255, 154, 40, 0.60), rgba(255, 87, 34, 0.42), rgba(255, 174, 66, 0.55));
+    --summer-panel-strong: linear-gradient(120deg, rgba(255, 196, 92, 0.7), rgba(255, 120, 40, 0.55));
+    --summer-sun: rgba(255, 205, 92, 0.95);
+    --summer-coral: rgba(255, 87, 65, 0.85);
+    --summer-water: rgba(38, 198, 218, 0.82);
+    --summer-shadow: rgba(110, 40, 0, 0.55);
+    --summer-glow: rgba(255, 160, 50, 0.6);
+    --summer-highlight: rgba(255, 224, 150, 0.9);
+    --summer-border: rgba(255, 200, 120, 0.45);
+}
+
+/* Zachte achtergrond-animatie voor de golf/flow */
+@keyframes waveFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Rustige adem-gloed voor accenten */
+@keyframes softGlow {
+    0%, 100% { box-shadow: 0 .25vh .8vh var(--summer-shadow), 0 0 1vh var(--summer-glow); }
+    50%      { box-shadow: 0 .25vh 1vh var(--summer-shadow), 0 0 1.8vh var(--summer-glow); }
+}
+
+/* Fade-in wanneer de HUD verschijnt */
+@keyframes hudFadeIn {
+    from { opacity: 0; transform: translateY(1vh); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.future-hud {
+    position: absolute;
+    display: none;
+    right: 2vh;
+    bottom: 6.5vh;
+    width: 65vh;
+    animation: hudFadeIn .35s ease-out;
+    font-family: 'Montserrat-SemiBold';
+}
+
+.future-needs {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 3.65vh;
+}
+
+.future-need {
+    width: 3.40vh;
+    height: 3.40vh;
+    margin-bottom: 1vh;
+    border-radius: .75vh;
+    gap: 4.6vh;
+    box-shadow: 0 .25vh .8vh var(--summer-shadow), 0 0 1.2vh var(--summer-glow);
+    border: 1px solid var(--summer-border);
+    overflow: hidden;
+    transition: box-shadow .3s ease;
+}
+
+.future-need-img {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 2.6vh;
+    margin: 0.5vh;
+    height: 2.5vh;
+    filter: brightness(150%) drop-shadow(0 0 .3vh rgba(255,150,40,0.6));
+}
+
+.future-moneyconainer {
+    position: absolute;
+    display: flex;
+    right: 4.25vh;
+    bottom: 1vh;
+}
+
+.future-money-cat-bg {
+    width: 3.35vh;
+    height: 3.35vh;
+    margin: 0vh 0vh 0vh .5vh;
+    border-radius: 1vh 0vh 0vh 1vh;
+    background: var(--summer-panel);
+    background-size: 200% 200%;
+    animation: waveFlow 6s ease-in-out infinite;
+    box-shadow: 0 .25vh .8vh var(--summer-shadow), 0 0 1vh var(--summer-glow);
+    border: 1px solid var(--summer-border);
+    border-right: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.future-money-cat {
+    height: 2vh;
+    width: 2.35vh;
+    margin: .65vh;
+    filter: drop-shadow(0 0 .3vh rgba(255,150,40,0.5));
+}
+
+.future-money-value {
+    color: white;
+    height: 3.34vh;
+    font-size: 1.3vh;
+    line-height: 3.34vh;
+    padding: 0vh .75vh 0vh .5vh;
+    font-family: 'Montserrat-Bold';
+    letter-spacing: .02vh;
+    border-radius: 0vh 1vh 1vh 0vh;
+    text-shadow: 1px 1px 2px var(--summer-shadow);
+    background: var(--summer-panel);
+    background-size: 200% 200%;
+    animation: waveFlow 6s ease-in-out infinite;
+    box-shadow: 0 .25vh .8vh var(--summer-shadow), 0 0 1vh var(--summer-glow);
+    border: 1px solid var(--summer-border);
+    border-left: none;
+}
+
+.future-mainjob {
+    position: absolute;
+    display: flex;
+    align-items: center;
+
+    right: 4.25vh;
+    height: 3.45vh;
+    bottom: 5.35vh;
+    border-radius: 1vh;
+    background: var(--summer-panel);
+    background-size: 200% 200%;
+    animation: waveFlow 6s ease-in-out infinite;
+    box-shadow: 0 .25vh .8vh var(--summer-shadow), 0 0 1vh var(--summer-glow);
+    border: 1px solid var(--summer-border);
+}
+
+.future-mainjob-bg {
+    width: 3.35vh;
+    height: 3.35vh;
+    margin: 0vh 0vh 0vh .5vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.future-mainjob-cat {
+    height: 2.5vh;
+    width: 2.5vh;
+    margin: .75vh .65vh;
+    filter: drop-shadow(0 0 .3vh rgba(255,150,40,0.5));
+}
+
+.future-mainjob-value {
+    width: auto;
+    color: white;
+    height: 3.34vh;
+    font-size: 1.3vh;
+    line-height: 3.34vh;
+    padding: 0vh .75vh 0vh .5vh;
+    font-family: 'Montserrat-Bold';
+    letter-spacing: .02vh;
+    text-shadow: 1px 1px 2px var(--summer-shadow);
+}
+
+/* Secondjob */
+
+.future-secondjob {
+    position: absolute;
+    display: flex;
+
+    height: 4vh;
+    bottom: 9.1vh;
+    right: 11.75vh;
+    border-radius: 1vh;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.future-secondjob-bg {
+    width: 3.35vh;
+    height: 3.35vh;
+    margin: 0vh 0vh 0vh .5vh;
+    border-radius: 1vh 0vh 0vh 1vh;
+    background: var(--summer-panel);
+    background-size: 200% 200%;
+    animation: waveFlow 6s ease-in-out infinite;
+    box-shadow: 0 .25vh .8vh var(--summer-shadow), 0 0 1vh var(--summer-glow);
+    border: 1px solid var(--summer-border);
+    border-right: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.future-secondjob-cat-id {
+    height: 2.5vh;
+    width: 2.5vh;
+    margin: .65vh;
+    filter: saturate(160%) drop-shadow(0 0 .3vh rgba(255,150,40,0.5));
+}
+
+.future-secondjob-cat {
+    height: 2.5vh;
+    width: 2.5vh;
+    margin: .65vh;
+    filter: saturate(160%) drop-shadow(0 0 .3vh rgba(255,150,40,0.5));
+}
+
+.future-secondjob-new {
+    position: absolute;
+    display: flex;
+
+    height: 4vh;
+    bottom: 9.1vh;
+    right: 4.25vh;
+    border-radius: 1vh;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.future-secondjob-value {
+    color: white;
+    height: 3.35vh;
+    font-size: 1.3vh;
+    line-height: 3.35vh;
+    padding: 0vh .75vh 0vh .5vh;
+    font-family: 'Montserrat-Bold';
+    letter-spacing: .02vh;
+    border-radius: 0vh 1vh 1vh 0vh;
+    text-shadow: 1px 1px 2px var(--summer-shadow);
+    background: var(--summer-panel);
+    background-size: 200% 200%;
+    animation: waveFlow 6s ease-in-out infinite;
+    box-shadow: 0 .25vh .8vh var(--summer-shadow), 0 0 1vh var(--summer-glow);
+    border: 1px solid var(--summer-border);
+    border-left: none;
+}
+
+.future-watermark {
+    padding: .4vh;
+    width: 2.75vh;
+    height: 2.75vh;
+    filter: drop-shadow(0 0 .4vh rgba(255,190,80,0.7));
+}
+
+/* >> Data's << */
+::-webkit-scrollbar {width: 0vh; height: 0vh;}
+
+[data-money="black_money"]{color: rgb(255, 120, 90);}
+[data-needed="hunger"] {background: linear-gradient(160deg, var(--summer-panel-strong) 45%, var(--summer-coral) 100%);}
+[data-needed="thirst"] {background: linear-gradient(160deg, var(--summer-panel-strong) 45%, var(--summer-water) 100%);}
+[data-needed="watermark"] {background: linear-gradient(160deg, var(--summer-highlight) 0%, var(--summer-sun) 100%);}
