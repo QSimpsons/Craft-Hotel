@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mallorca FPS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="panel-container" class="fps-panel" style="display: none;">
+        <div class="sunset-bar"></div>
+
+        <!-- Header -->
+        <div class="panel-header">
+            <div class="header-left">
+                <img src="logo.png" alt="Mallorca FPS" class="panel-logo" onerror="this.style.display='none'">
+                <div class="header-text">
+                    <h1><span>MALLORCA</span> FPS</h1>
+                    <p>Mallorca Roleplay · Performance Menu</p>
+                </div>
+            </div>
+            <button id="icon-close" class="close-icon" aria-label="Sluiten">&times;</button>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div id="stat-fps" class="stat-value">--</div>
+                <div class="stat-label">FPS</div>
+            </div>
+            <div class="stat-box">
+                <div id="stat-ping" class="stat-value">--</div>
+                <div class="stat-label">Ping</div>
+            </div>
+            <div class="stat-box">
+                <div id="stat-health" class="stat-value">--</div>
+                <div class="stat-label">Health</div>
+            </div>
+            <div class="stat-box">
+                <div id="stat-armor" class="stat-value">--</div>
+                <div class="stat-label">Armor</div>
+            </div>
+        </div>
+
+        <!-- Location -->
+        <div class="location-box">
+            Locatie: <strong id="stat-location">Laden...</strong>
+        </div>
+
+        <!-- Settings Grid -->
+        <div class="settings-grid">
+            <button class="setting-card" id="btn-laag">
+                <h3>LAAG</h3>
+                <p>BETERE FPS MET MINIMALE RENDERING</p>
+            </button>
+            <button class="setting-card" id="btn-boost">
+                <h3>SNELLE BOOST</h3>
+                <p>INTENSE EFFECTEN OP PARTICLES VOOR BETERE FPS</p>
+            </button>
+            <button class="setting-card" id="btn-texturen">
+                <h3>LAGE TEXTUREN</h3>
+                <p>BOOST FPS DOOR TEXTUURKWALITEIT TE VERLAGEN</p>
+            </button>
+            <button class="setting-card" id="btn-nogpu">
+                <h3>GEEN GPU</h3>
+                <p>IK BEN ARM DUS GEEN GPU 😭</p>
+            </button>
+            <button class="setting-card" id="btn-grafics">
+                <h3>BETERE GRAFICS</h3>
+                <p>VERHOOGT DE GRAFISCHE KWALITEIT (NIET AANBEVOLEN)</p>
+            </button>
+            <button class="setting-card" id="btn-vignette">
+                <h3>VIGNETTE</h3>
+                <p>FOCUS OP JE KARAKTER, REST VAN SCHERM DONKER</p>
+            </button>
+            <button class="setting-card" id="btn-zwartwit">
+                <h3>ZWART-WIT</h3>
+                <p>GA TERUG NAAR DE OUDE TIJDEN (FILM NOIR)</p>
+            </button>
+
+            <button class="setting-card locked-blur" id="btn-coming-soon" disabled>
+                <div class="blur-content" style="opacity: 0.5;">
+                    <h3>COMING SOON</h3>
+                    <p>Deze functie komt in een latere update</p>
+                </div>
+            </button>
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="panel-footer">
+            <button id="btn-reset" class="btn-reset">Reset Settings</button>
+            <button id="btn-close" class="btn-close">Sluiten</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
