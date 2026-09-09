@@ -5,6 +5,8 @@
   --yellow: #ffd23a;
   --red: #ff3b3b;
   --amber: #ffb020;
+  --fluo-orange: #ff7a00;
+  --fluo-orange-bright: #ff9a1a;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -248,8 +250,12 @@ body.demo-mode {
   font-weight: 700;
   line-height: 0.95;
   letter-spacing: 0.02em;
-  color: #fff;
-  text-shadow: 0 0.15vh 0.8vh rgba(0, 0, 0, 0.45);
+  color: var(--fluo-orange-bright);
+  text-shadow:
+    0 0 0.35vh rgba(255, 122, 0, 0.95),
+    0 0 0.9vh rgba(255, 122, 0, 0.75),
+    0 0 1.8vh rgba(255, 90, 0, 0.45),
+    0 0.15vh 0.5vh rgba(0, 0, 0, 0.35);
   font-variant-numeric: tabular-nums;
 }
 
@@ -258,7 +264,8 @@ body.demo-mode {
   font-size: 1.15vh;
   font-weight: 600;
   letter-spacing: 0.16em;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 154, 26, 0.85);
+  text-shadow: 0 0 0.6vh rgba(255, 122, 0, 0.45);
 }
 
 @keyframes blink {
