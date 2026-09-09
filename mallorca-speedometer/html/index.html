@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mallorca Speedometer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="speedo" class="speedo" aria-hidden="true">
+    <div class="row">
+      <!-- Links: handrem + pinkers -->
+      <button type="button" id="ind-handbrake" class="icon" title="Handrem" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M11.1 6.8h1.8v7.2h-1.8zm0 8.6h1.8V18h-1.8z" fill="currentColor"/>
+        </svg>
+      </button>
+
+      <button type="button" id="ind-left" class="icon" title="Links" tabindex="-1">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 5.2 7 12l8.2 6.8V14h5.3V10H15.2V5.2z"/></svg>
+      </button>
+
+      <button type="button" id="ind-hazard" class="icon hazard" title="Noodknippers" tabindex="-1">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M12 3.2 2.4 20.8h19.2L12 3.2zm0 4.4 5.7 10.2H6.3L12 7.6z"/>
+          <path fill="currentColor" d="M11.15 11h1.7v4.2h-1.7zm0 5.1h1.7V18h-1.7z"/>
+        </svg>
+      </button>
+
+      <button type="button" id="ind-right" class="icon" title="Rechts" tabindex="-1">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M8.8 5.2 17 12l-8.2 6.8V14H3.5V10h5.3V5.2z"/></svg>
+      </button>
+
+      <!-- Midden: snelheid met bogen -->
+      <div class="speed-wrap">
+        <svg class="arcs" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="arc-track" cx="60" cy="60" r="48" />
+          <circle id="arc" class="arc-fill" cx="60" cy="60" r="48" />
+          <circle class="arc-track-inner" cx="60" cy="60" r="40" />
+        </svg>
+        <div class="speed-core">
+          <div id="speed" class="speed">0</div>
+          <div id="unit" class="unit">KM/H</div>
+        </div>
+      </div>
+
+      <!-- Rechts: schade + motor -->
+      <button type="button" id="ind-damage" class="icon status green" title="Schade" tabindex="-1">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M12 2.8 2.2 20.6h19.6L12 2.8zm0 3.8 6.6 11.8H5.4L12 6.6z"/>
+          <path fill="currentColor" d="M11.15 10.2h1.7v4.3h-1.7zm0 5.2h1.7V17h-1.7z"/>
+        </svg>
+      </button>
+
+      <button type="button" id="ind-engine" class="icon status green" title="Motor" tabindex="-1">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M8 8V6h3v2h.8l1.7-1.7H17V9h1.5v1.6H20v2.2h-1.5V15H20v2.2h-1.5V20h-3.7L13 18.2H9.8V20H7.5v-1.8H5.2v-2.4H7V13H5.2v-2.4H7V9h1zm1.8 2.2v5.8h2.6l1.4 1.4h2.4v-1.6h-1.3l-1.5-1.5v-4.1h.9V9.8h-1.5l-1.2 1.4H9.8z"/>
+        </svg>
+      </button>
+
+      <button type="button" id="ind-lights" class="icon lights" title="Lichten" tabindex="-1">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M4 7.2c3.4 0 6.2 2.8 6.2 6.2S7.4 19.6 4 19.6V7.2zm8.4 1.3h8.2v1.6h-8.2zm0 3.5h8.2v1.6h-8.2zm0 3.5h8.2v1.6h-8.2z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="demo" class="demo hidden">
+    <h1>Speedometer demo</h1>
+    <p>Zelfde stijl als je voorbeeld</p>
+    <label>Snelheid <input id="demo-speed" type="range" min="0" max="280" value="67" /></label>
+    <label>Motor
+      <select id="demo-engine">
+        <option value="green">Groen</option>
+        <option value="yellow">Geel</option>
+        <option value="red">Rood</option>
+      </select>
+    </label>
+    <label>Schade
+      <select id="demo-damage">
+        <option value="green">Groen</option>
+        <option value="yellow">Geel</option>
+        <option value="red">Rood</option>
+      </select>
+    </label>
+    <div class="demo-toggles">
+      <button type="button" data-toggle="left">Links</button>
+      <button type="button" data-toggle="hazard">Noodknippers</button>
+      <button type="button" data-toggle="right">Rechts</button>
+      <button type="button" data-toggle="handbrake">Handrem</button>
+      <button type="button" data-toggle="lights">Lichten</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+:root {
+  --text: #f5f7fa;
+  --dim: rgba(245, 247, 250, 0.28);
+  --green: #39e07a;
+  --yellow: #ffd23a;
+  --red: #ff3b3b;
+  --amber: #ffb020;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: transparent;
+  font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+  color: var(--text);
+  user-select: none;
+}
+
+body.demo-mode {
+  background:
+    radial-gradient(ellipse at 50% 80%, rgba(40, 80, 50, 0.35), transparent 50%),
+    linear-gradient(180deg, #1a2228 0%, #0c1014 100%);
+}
+
+.speedo {
+  position: absolute;
+  left: 50%;
+  bottom: 4.5vh;
+  transform: translateX(-50%) translateY(1.2vh);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.speedo.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5vh;
+}
+
+.icon {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--dim);
+  width: 3.4vh;
+  height: 3.4vh;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  cursor: default;
+  transition: color 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+  flex-shrink: 0;
+}
+
+.icon svg {
+  width: 2.55vh;
+  height: 2.55vh;
+  display: block;
+}
+
+.icon.active {
+  color: var(--amber);
+  filter: drop-shadow(0 0 0.55vh rgba(255, 176, 32, 0.65));
+  animation: blink 0.7s steps(1) infinite;
+}
+
+.icon.hazard.active {
+  color: var(--red);
+  filter: drop-shadow(0 0 0.55vh rgba(255, 59, 59, 0.7));
+}
+
+.icon#ind-handbrake.active {
+  color: var(--red);
+  filter: drop-shadow(0 0 0.6vh rgba(255, 50, 50, 0.75));
+  animation: none;
+}
+
+/* Motor: groen = gezond (zoals voorbeeld) */
+.icon.status.green {
+  color: var(--green);
+  filter: drop-shadow(0 0 0.5vh rgba(57, 224, 122, 0.55));
+  animation: none;
+}
+
+.icon.status.yellow {
+  color: var(--yellow);
+  filter: drop-shadow(0 0 0.5vh rgba(255, 210, 58, 0.55));
+  animation: none;
+}
+
+.icon.status.red {
+  color: var(--red);
+  filter: drop-shadow(0 0 0.55vh rgba(255, 59, 59, 0.7));
+  animation: none;
+}
+
+/* Schade: dim bij gezond, alleen geel/rood bij probleem */
+.icon#ind-damage.status.green {
+  color: var(--dim);
+  filter: none;
+}
+
+.icon.lights.on {
+  color: var(--green);
+  filter: drop-shadow(0 0 0.5vh rgba(57, 224, 122, 0.55));
+  animation: none;
+}
+
+.speed-wrap {
+  position: relative;
+  width: 13.5vh;
+  height: 13.5vh;
+  margin: 0 0.6vh;
+  flex-shrink: 0;
+}
+
+.arcs {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(135deg);
+}
+
+.arc-track,
+.arc-track-inner,
+.arc-fill {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.arc-track {
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 2.2;
+  stroke-dasharray: 226; /* ~75% of 2πr with r=48 */
+  stroke-dashoffset: 56.5;
+}
+
+.arc-track-inner {
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 1.4;
+  stroke-dasharray: 188;
+  stroke-dashoffset: 47;
+}
+
+.arc-fill {
+  stroke: #ffffff;
+  stroke-width: 2.4;
+  stroke-dasharray: 226;
+  stroke-dashoffset: 226;
+  filter: drop-shadow(0 0 0.35vh rgba(255, 255, 255, 0.45));
+  transition: stroke-dashoffset 0.12s linear;
+}
+
+.speed-core {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 0.3vh;
+}
+
+.speed {
+  font-size: 4.6vh;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: #fff;
+  text-shadow: 0 0.15vh 0.8vh rgba(0, 0, 0, 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  margin-top: 0.25vh;
+  font-size: 1.15vh;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+@keyframes blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0.28; }
+}
+
+/* Demo panel */
+.demo {
+  position: absolute;
+  left: 2.5vh;
+  top: 2.5vh;
+  width: min(40vh, 92vw);
+  padding: 1.8vh;
+  border-radius: 1.2vh;
+  background: rgba(8, 10, 12, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #eef2f6;
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+  pointer-events: auto;
+}
+
+.demo.hidden { display: none; }
+
+.demo h1 { font-size: 2vh; }
+.demo p { font-size: 1.25vh; color: rgba(238, 242, 246, 0.55); }
+
+.demo label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35vh;
+  font-size: 1.15vh;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(238, 242, 246, 0.55);
+}
+
+.demo input,
+.demo select,
+.demo button {
+  font: inherit;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.6vh;
+  padding: 0.65vh 0.9vh;
+}
+
+.demo-toggles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6vh;
+}
+
+.demo button.active {
+  background: rgba(57, 224, 122, 0.18);
+  border-color: rgba(57, 224, 122, 0.45);
+}

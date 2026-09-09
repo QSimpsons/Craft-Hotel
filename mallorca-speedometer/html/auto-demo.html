@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speedometer auto-demo</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .demo-banner {
+      position: absolute;
+      left: 50%;
+      top: 2.5vh;
+      transform: translateX(-50%);
+      padding: 1vh 2vh;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.55);
+      border: 1px solid rgba(255,200,120,0.35);
+      color: #fff3e2;
+      font-size: 1.6vh;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      z-index: 5;
+    }
+  </style>
+</head>
+<body class="demo-mode">
+  <div class="demo-banner" id="banner">Demo start…</div>
+  <div id="speedo" class="speedo visible" aria-hidden="false">
+    <div class="speedo-row">
+      <div id="ind-left" class="ind"><svg viewBox="0 0 24 24"><path d="M14 6l-8 6 8 6V6zM18 6v12h2V6h-2z"/></svg></div>
+      <div id="ind-hazard" class="ind hazard"><svg viewBox="0 0 24 24"><path d="M12 3L2 21h20L12 3zm0 4.5l6.2 11H5.8L12 7.5zM11 12h2v4h-2v-4zm0 5h2v2h-2v-2z"/></svg></div>
+      <div id="ind-right" class="ind"><svg viewBox="0 0 24 24"><path d="M10 6l8 6-8 6V6zM4 6v12h2V6H4z"/></svg></div>
+      <div class="divider" aria-hidden="true"></div>
+      <div class="speed-block">
+        <div id="speed" class="speed">0</div>
+        <div id="unit" class="unit">km/h</div>
+        <svg class="mini-arc" viewBox="0 0 120 18" aria-hidden="true">
+          <defs>
+            <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#26c6da" />
+              <stop offset="55%" stop-color="#ffc45c" />
+              <stop offset="100%" stop-color="#ff5734" />
+            </linearGradient>
+          </defs>
+          <line class="track-line" x1="4" y1="9" x2="116" y2="9" />
+          <line id="arc" class="arc-line" x1="4" y1="9" x2="116" y2="9" />
+        </svg>
+      </div>
+      <div class="divider" aria-hidden="true"></div>
+      <div id="ind-engine" class="ind status green"><svg viewBox="0 0 24 24"><path d="M7 9V7h4v2h1l2-2h3v3h2v2h-2v2h2v2h-2v3h-3l-2-2H9v2H7v-2H5v-2h2v-2H5v-2h2V9zm2 2v6h3.2l1.5 1.5H17v-2h-1.5L14 15.2V11h1V9h-1.8L12 11H9z"/></svg><span class="label">Motor</span></div>
+      <div id="ind-damage" class="ind status green"><svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 4l7.5 13h-15L12 6zm-1 4h2v5h-2v-5zm0 6h2v2h-2v-2z"/></svg><span class="label">Schade</span></div>
+      <div id="ind-handbrake" class="ind handbrake"><svg viewBox="0 0 24 24"><path d="M8 4h8v2H8V4zm1 4h6l1 3h2v2h-1l-1.2 7H8.2L7 13H6v-2h2l1-3zm1.3 5l-.5 3h4.4l-.5-3H10.3z"/></svg><span class="label">Handrem</span></div>
+    </div>
+    <div class="bars">
+      <div class="bar"><span>Motor</span><div class="bar-track"><div id="engine-bar" class="bar-fill green"></div></div></div>
+      <div class="bar"><span>Carrosserie</span><div class="bar-track"><div id="body-bar" class="bar-fill green"></div></div></div>
+    </div>
+  </div>
+  <div id="demo" class="demo hidden"></div>
+  <script>window.GetParentResourceName = () => 'mallorca-speedometer';</script>
+  <script src="app.js"></script>
+  <script>
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const banner = document.getElementById('banner');
+    const say = (t) => { banner.textContent = t; };
+
+    async function run() {
+      await sleep(600);
+      say('Snelheid omhoog');
+      for (let s = 20; s <= 180; s += 8) {
+        window.dispatchEvent(new MessageEvent('message', { data: { action: 'update', data: {
+          speed: s, maxSpeed: 280, unit: 'km/h', engine: 'green', damage: 'green',
+          engineHealth: 95, bodyHealth: 92, left: false, right: false, hazard: false, handbrake: false
+        }}}));
+        await sleep(50);
+      }
+
+      say('Motor → rood · Schade → geel');
+      window.dispatchEvent(new MessageEvent('message', { data: { action: 'update', data: {
+        speed: 140, maxSpeed: 280, unit: 'km/h', engine: 'red', damage: 'yellow',
+        engineHealth: 12, bodyHealth: 45, left: false, right: false, hazard: false, handbrake: false
+      }}}));
+      await sleep(1200);
+
+      say('Links pinker');
+      window.dispatchEvent(new MessageEvent('message', { data: { action: 'update', data: {
+        speed: 90, maxSpeed: 280, unit: 'km/h', engine: 'red', damage: 'yellow',
+        engineHealth: 12, bodyHealth: 40, left: true, right: false, hazard: false, handbrake: false
+      }}}));
+      await sleep(1400);
+
+      say('Noodknippers + handrem');
+      window.dispatchEvent(new MessageEvent('message', { data: { action: 'update', data: {
+        speed: 0, maxSpeed: 280, unit: 'km/h', engine: 'red', damage: 'yellow',
+        engineHealth: 12, bodyHealth: 40, left: true, right: true, hazard: true, handbrake: true
+      }}}));
+      await sleep(2200);
+      say('Demo klaar');
+    }
+    run();
+  </script>
+</body>
+</html>
