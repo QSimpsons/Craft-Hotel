@@ -12,12 +12,60 @@ local function healthState(value, greenAt, yellowAt)
     return 'red'
 end
 
+local function fuelState(percent)
+    local greenAt = (Config.Fuel and Config.Fuel.green) or 40
+    local yellowAt = (Config.Fuel and Config.Fuel.yellow) or 15
+    return healthState(percent, greenAt, yellowAt)
+end
+
+local function getFuelPercent(vehicle)
+    local cfg = Config.Fuel or {}
+    local resource = cfg.Resource
+    local exportName = cfg.Export or 'GetFuel'
+
+    if type(resource) == 'string' and resource ~= '' and GetResourceState(resource) == 'started' then
+        local ok, value = pcall(function()
+            return exports[resource][exportName](vehicle)
+        end)
+        if ok and type(value) == 'number' then
+            return math.max(0.0, math.min(100.0, value + 0.0))
+        end
+    end
+
+    -- Fallbacks voor populaire fuel-scripts zonder config
+    local fallbacks = {
+        { 'LegacyFuel', 'GetFuel' },
+        { 'ox_fuel', 'GetFuel' },
+        { 'cdn-fuel', 'GetFuel' },
+        { 'qs-fuelstations', 'GetFuel' },
+        { 'lc_fuel', 'GetFuel' },
+        { 'ti_fuel', 'getFuel' },
+    }
+
+    for i = 1, #fallbacks do
+        local name, exp = fallbacks[i][1], fallbacks[i][2]
+        if GetResourceState(name) == 'started' then
+            local ok, value = pcall(function()
+                return exports[name][exp](vehicle)
+            end)
+            if ok and type(value) == 'number' then
+                return math.max(0.0, math.min(100.0, value + 0.0))
+            end
+        end
+    end
+
+    local level = GetVehicleFuelLevel(vehicle)
+    if type(level) ~= 'number' then
+        return 100.0
+    end
+    return math.max(0.0, math.min(100.0, level + 0.0))
+end
+
 local function applyIndicators(vehicle)
     if not vehicle or vehicle == 0 then
         return
     end
 
-    -- 0 = links, 1 = rechts
     if hazardOn then
         SetVehicleIndicatorLights(vehicle, 0, true)
         SetVehicleIndicatorLights(vehicle, 1, true)
@@ -57,6 +105,25 @@ local function getDriverVehicle()
     return vehicle
 end
 
+local function isHandbrakeOn(vehicle)
+    if GetVehicleHandbrake(vehicle) then
+        return true
+    end
+    -- Extra fallback terwijl je stilstaat met handrem-input
+    if IsControlPressed(0, 76) then -- INPUT_VEH_HANDBRAKE
+        return true
+    end
+    return false
+end
+
+local function areLightsOn(vehicle)
+    local ok, lightsOn, highbeams = pcall(GetVehicleLightsState, vehicle)
+    if not ok then
+        return false
+    end
+    return lightsOn == 1 or highbeams == 1 or lightsOn == true or highbeams == true
+end
+
 CreateThread(function()
     while true do
         local vehicle = getDriverVehicle()
@@ -77,9 +144,7 @@ CreateThread(function()
             local speed = Config.UseKmh and (speedRaw * 3.6) or (speedRaw * 2.236936)
             local engineHealth = GetVehicleEngineHealth(vehicle)
             local bodyHealth = GetVehicleBodyHealth(vehicle)
-            local handbrake = GetVehicleHandbrake(vehicle)
-            local _, lightsOn, highbeams = GetVehicleLightsState(vehicle)
-            local lights = lightsOn == 1 or highbeams == 1
+            local fuel = getFuelPercent(vehicle)
 
             local showLeft = hazardOn or leftIndicator
             local showRight = hazardOn or rightIndicator
@@ -92,11 +157,13 @@ CreateThread(function()
                 engineHealth = math.floor(math.max(0.0, math.min(1000.0, engineHealth)) / 10.0),
                 damage = healthState(bodyHealth, Config.Body.green, Config.Body.yellow),
                 bodyHealth = math.floor(math.max(0.0, math.min(1000.0, bodyHealth)) / 10.0),
+                fuel = math.floor(fuel + 0.5),
+                fuelState = fuelState(fuel),
                 left = showLeft,
                 right = showRight,
                 hazard = hazardOn,
-                handbrake = handbrake,
-                lights = lights,
+                handbrake = isHandbrakeOn(vehicle),
+                lights = areLightsOn(vehicle),
                 engineOn = GetIsVehicleEngineRunning(vehicle)
             })
 
@@ -138,9 +205,6 @@ if Config.EnableIndicatorKeys then
         if hazardOn then
             leftIndicator = false
             rightIndicator = false
-        else
-            applyIndicators(vehicle)
-            return
         end
         applyIndicators(vehicle)
     end, false)
