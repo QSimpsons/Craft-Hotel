@@ -117,6 +117,75 @@ body.demo-mode {
   animation: none;
 }
 
+/* Tankmeter */
+.fuel {
+  position: relative;
+  width: 5vh;
+  height: 5vh;
+  flex-shrink: 0;
+  color: var(--green);
+  display: grid;
+  place-items: center;
+}
+
+.fuel-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.fuel-track,
+.fuel-fill {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.fuel-track {
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 2.8;
+}
+
+.fuel-fill {
+  stroke: currentColor;
+  stroke-width: 2.8;
+  stroke-dasharray: 106.8;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.2s ease, stroke 0.2s ease;
+  filter: drop-shadow(0 0 0.35vh currentColor);
+}
+
+.fuel-icon {
+  width: 1.7vh;
+  height: 1.7vh;
+  z-index: 1;
+  margin-top: -0.7vh;
+}
+
+.fuel-pct {
+  position: absolute;
+  bottom: 0.05vh;
+  font-size: 0.95vh;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 255, 255, 0.82);
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.fuel.green { color: var(--green); }
+.fuel.yellow { color: var(--yellow); }
+.fuel.red {
+  color: var(--red);
+  animation: pulseFuel 1.1s ease-in-out infinite;
+}
+
+@keyframes pulseFuel {
+  0%, 100% { filter: drop-shadow(0 0 0.2vh rgba(255, 59, 59, 0.35)); }
+  50% { filter: drop-shadow(0 0 0.55vh rgba(255, 59, 59, 0.75)); }
+}
+
 .speed-wrap {
   position: relative;
   width: 13.5vh;

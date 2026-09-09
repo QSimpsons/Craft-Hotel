@@ -1,41 +1,44 @@
 # Mallorca Speedometer
 
-FiveM voertuig-HUD met snelheid, motorstatus, carrosserieschade, knipperlichten, noodknippers en handrem.
+FiveM HUD: snelheid, tank, motor, schade, pinkers, noodknippers, handrem en lichten.
 
 ## Installatie
-
-1. Kopieer de map `mallorca-speedometer` naar je `resources` folder.
-2. Voeg toe aan `server.cfg`:
 
 ```cfg
 ensure mallorca-speedometer
 ```
 
-3. Herstart de resource of de server.
+## Functies
 
-## Wat zie je
+| Onderdeel | Werking |
+|-----------|---------|
+| Snelheid | km/h met boog |
+| **Tank** | Ronde meter + % (groen / geel / rood) |
+| Motor | Groen / geel / rood |
+| Schade | Dim bij gezond, geel/rood bij schade |
+| Links / rechts | Knipperlichten |
+| Noodknippers | Beide pinkers |
+| Handrem | Rood als die erop staat |
+| Lichten | Groen als lampen aan staan |
 
-| Indicator | Betekenis |
-|-----------|-----------|
-| **Snelheid** | Huidige snelheid in km/h |
-| **Motor** | Groen / geel / rood op basis van engine health |
-| **Schade** | Groen / geel / rood op basis van body health |
-| **Links / Rechts** | Knipperlichten (knipperen oranje) |
-| **Noodknippers** | Beide richtingaanwijzers (rood/oranje) |
-| **Handrem** | Wordt rood als de handrem erop staat |
+## Brandstof-script
 
-## Bediening (standaard)
+Standaard: `GetVehicleFuelLevel` (GTA native).
 
-- **Pijl links** — knipperlicht links
-- **Pijl rechts** — knipperlicht rechts
-- **Pijl omlaag** — noodknippers aan/uit
+Gebruik je LegacyFuel / ox_fuel / cdn-fuel e.d., zet in `config.lua`:
 
-Toetsen aanpassen via FiveM instellingen (Key Bindings → FiveM) of in `config.lua`.
+```lua
+Config.Fuel.Resource = 'LegacyFuel'  -- of 'ox_fuel', 'cdn-fuel', ...
+Config.Fuel.Export = 'GetFuel'
+```
 
-## Config
+Zonder config probeert de resource automatisch bekende fuel-scripts.
 
-Zie `config.lua` voor eenheden (km/h of mph), max snelheid op de meter, drempels voor groen/geel/rood en refresh-snelheid.
+## Toetsen
 
-## Browser demo
+- Pijl links / rechts — pinkers  
+- Pijl omlaag — noodknippers  
 
-Open `html/index.html` in een browser om de UI te testen zonder FiveM.
+## Preview
+
+Open `html/index.html` of `html/voorbeeld.html` in een browser.
