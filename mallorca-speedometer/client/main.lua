@@ -78,6 +78,8 @@ CreateThread(function()
             local engineHealth = GetVehicleEngineHealth(vehicle)
             local bodyHealth = GetVehicleBodyHealth(vehicle)
             local handbrake = GetVehicleHandbrake(vehicle)
+            local _, lightsOn, highbeams = GetVehicleLightsState(vehicle)
+            local lights = lightsOn == 1 or highbeams == 1
 
             local showLeft = hazardOn or leftIndicator
             local showRight = hazardOn or rightIndicator
@@ -94,6 +96,7 @@ CreateThread(function()
                 right = showRight,
                 hazard = hazardOn,
                 handbrake = handbrake,
+                lights = lights,
                 engineOn = GetIsVehicleEngineRunning(vehicle)
             })
 

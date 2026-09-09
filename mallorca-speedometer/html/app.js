@@ -1,5 +1,8 @@
 (() => {
-  const ARC_LEN = 112; // lengte van de horizontale snelheidsbalk
+  // r=48, 75% van cirkel (270°)
+  const ARC_TOTAL = 2 * Math.PI * 48;
+  const ARC_VISIBLE = ARC_TOTAL * 0.75;
+  const ARC_HIDDEN = ARC_TOTAL - ARC_VISIBLE;
 
   const el = {
     root: document.getElementById('speedo'),
@@ -12,30 +15,31 @@
     engine: document.getElementById('ind-engine'),
     damage: document.getElementById('ind-damage'),
     handbrake: document.getElementById('ind-handbrake'),
-    engineBar: document.getElementById('engine-bar'),
-    bodyBar: document.getElementById('body-bar'),
+    lights: document.getElementById('ind-lights'),
     demo: document.getElementById('demo'),
   };
+
+  // init stroke
+  if (el.arc) {
+    el.arc.style.strokeDasharray = String(ARC_TOTAL);
+    el.arc.style.strokeDashoffset = String(ARC_TOTAL);
+  }
 
   const state = {
     left: false,
     right: false,
     hazard: false,
     handbrake: false,
+    lights: true,
   };
 
   function setActive(node, on) {
+    if (!node) return;
     node.classList.toggle('active', !!on);
   }
 
   function setStatus(node, status) {
-    node.classList.remove('green', 'yellow', 'red');
-    node.classList.add(status || 'green');
-  }
-
-  function setBar(node, percent, status) {
-    const p = Math.max(0, Math.min(100, Number(percent) || 0));
-    node.style.transform = `scaleX(${p / 100})`;
+    if (!node) return;
     node.classList.remove('green', 'yellow', 'red');
     node.classList.add(status || 'green');
   }
@@ -46,9 +50,11 @@
     const ratio = speed / max;
 
     el.speed.textContent = String(Math.round(speed));
-    el.unit.textContent = data.unit || 'km/h';
+    el.unit.textContent = (data.unit || 'km/h').toUpperCase();
+
     if (el.arc) {
-      el.arc.style.strokeDashoffset = String(ARC_LEN - ARC_LEN * ratio);
+      // start vanaf verborgen deel, vul zichtbare boog
+      el.arc.style.strokeDashoffset = String(ARC_HIDDEN + ARC_VISIBLE * (1 - ratio));
     }
 
     setActive(el.left, data.left);
@@ -59,15 +65,9 @@
     setStatus(el.engine, data.engine);
     setStatus(el.damage, data.damage);
 
-    const enginePct = data.engineHealth != null ? data.engineHealth : (
-      data.engine === 'green' ? 90 : data.engine === 'yellow' ? 50 : 15
-    );
-    const bodyPct = data.bodyHealth != null ? data.bodyHealth : (
-      data.damage === 'green' ? 90 : data.damage === 'yellow' ? 50 : 15
-    );
-
-    setBar(el.engineBar, enginePct, data.engine);
-    setBar(el.bodyBar, bodyPct, data.damage);
+    if (el.lights) {
+      el.lights.classList.toggle('on', data.lights !== false);
+    }
 
     el.root.classList.add('visible');
     el.root.setAttribute('aria-hidden', 'false');
@@ -80,14 +80,10 @@
 
   window.addEventListener('message', (event) => {
     const msg = event.data || {};
-    if (msg.action === 'update') {
-      update(msg.data || {});
-    } else if (msg.action === 'hide') {
-      hide();
-    }
+    if (msg.action === 'update') update(msg.data || {});
+    else if (msg.action === 'hide') hide();
   });
 
-  // Browser preview buiten FiveM
   const isNui = typeof GetParentResourceName === 'function';
   if (!isNui) {
     document.body.classList.add('demo-mode');
@@ -102,12 +98,11 @@
         unit: 'km/h',
         engine,
         damage,
-        engineHealth: engine === 'green' ? 92 : engine === 'yellow' ? 48 : 12,
-        bodyHealth: damage === 'green' ? 88 : damage === 'yellow' ? 42 : 10,
         left: state.left || state.hazard,
         right: state.right || state.hazard,
         hazard: state.hazard,
         handbrake: state.handbrake,
+        lights: state.lights,
       });
     };
 
@@ -134,6 +129,8 @@
           if (state.right) state.left = false;
         } else if (key === 'handbrake') {
           state.handbrake = !state.handbrake;
+        } else if (key === 'lights') {
+          state.lights = !state.lights;
         }
 
         el.demo.querySelectorAll('[data-toggle]').forEach((b) => {
@@ -144,6 +141,9 @@
       });
     });
 
+    // default lights button active
+    const lightsBtn = el.demo.querySelector('[data-toggle="lights"]');
+    if (lightsBtn) lightsBtn.classList.add('active');
     syncDemo();
   }
 })();

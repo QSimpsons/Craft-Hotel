@@ -8,72 +8,69 @@
 </head>
 <body>
   <div id="speedo" class="speedo" aria-hidden="true">
-    <div class="speedo-row">
-      <div id="ind-left" class="ind" title="Links">
-        <svg viewBox="0 0 24 24"><path d="M14 6l-8 6 8 6V6zM18 6v12h2V6h-2z"/></svg>
-      </div>
-
-      <div id="ind-hazard" class="ind hazard" title="Noodknippers">
-        <svg viewBox="0 0 24 24"><path d="M12 3L2 21h20L12 3zm0 4.5l6.2 11H5.8L12 7.5zM11 12h2v4h-2v-4zm0 5h2v2h-2v-2z"/></svg>
-      </div>
-
-      <div id="ind-right" class="ind" title="Rechts">
-        <svg viewBox="0 0 24 24"><path d="M10 6l8 6-8 6V6zM4 6v12h2V6H4z"/></svg>
-      </div>
-
-      <div class="divider" aria-hidden="true"></div>
-
-      <div class="speed-block">
-        <div id="speed" class="speed">0</div>
-        <div id="unit" class="unit">km/h</div>
-        <svg class="mini-arc" viewBox="0 0 120 18" aria-hidden="true">
-          <defs>
-            <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#26c6da" />
-              <stop offset="55%" stop-color="#ffc45c" />
-              <stop offset="100%" stop-color="#ff5734" />
-            </linearGradient>
-          </defs>
-          <line class="track-line" x1="4" y1="9" x2="116" y2="9" />
-          <line id="arc" class="arc-line" x1="4" y1="9" x2="116" y2="9" />
+    <div class="row">
+      <!-- Links: handrem + pinkers -->
+      <button type="button" id="ind-handbrake" class="icon" title="Handrem" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M11.1 6.8h1.8v7.2h-1.8zm0 8.6h1.8V18h-1.8z" fill="currentColor"/>
         </svg>
+      </button>
+
+      <button type="button" id="ind-left" class="icon" title="Links" tabindex="-1">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.2 5.2 7 12l8.2 6.8V14h5.3V10H15.2V5.2z"/></svg>
+      </button>
+
+      <button type="button" id="ind-hazard" class="icon hazard" title="Noodknippers" tabindex="-1">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M12 3.2 2.4 20.8h19.2L12 3.2zm0 4.4 5.7 10.2H6.3L12 7.6z"/>
+          <path fill="currentColor" d="M11.15 11h1.7v4.2h-1.7zm0 5.1h1.7V18h-1.7z"/>
+        </svg>
+      </button>
+
+      <button type="button" id="ind-right" class="icon" title="Rechts" tabindex="-1">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M8.8 5.2 17 12l-8.2 6.8V14H3.5V10h5.3V5.2z"/></svg>
+      </button>
+
+      <!-- Midden: snelheid met bogen -->
+      <div class="speed-wrap">
+        <svg class="arcs" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="arc-track" cx="60" cy="60" r="48" />
+          <circle id="arc" class="arc-fill" cx="60" cy="60" r="48" />
+          <circle class="arc-track-inner" cx="60" cy="60" r="40" />
+        </svg>
+        <div class="speed-core">
+          <div id="speed" class="speed">0</div>
+          <div id="unit" class="unit">KM/H</div>
+        </div>
       </div>
 
-      <div class="divider" aria-hidden="true"></div>
+      <!-- Rechts: schade + motor -->
+      <button type="button" id="ind-damage" class="icon status green" title="Schade" tabindex="-1">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M12 2.8 2.2 20.6h19.6L12 2.8zm0 3.8 6.6 11.8H5.4L12 6.6z"/>
+          <path fill="currentColor" d="M11.15 10.2h1.7v4.3h-1.7zm0 5.2h1.7V17h-1.7z"/>
+        </svg>
+      </button>
 
-      <div id="ind-engine" class="ind status green" title="Motor">
-        <svg viewBox="0 0 24 24"><path d="M7 9V7h4v2h1l2-2h3v3h2v2h-2v2h2v2h-2v3h-3l-2-2H9v2H7v-2H5v-2h2v-2H5v-2h2V9zm2 2v6h3.2l1.5 1.5H17v-2h-1.5L14 15.2V11h1V9h-1.8L12 11H9z"/></svg>
-        <span class="label">Motor</span>
-      </div>
+      <button type="button" id="ind-engine" class="icon status green" title="Motor" tabindex="-1">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M8 8V6h3v2h.8l1.7-1.7H17V9h1.5v1.6H20v2.2h-1.5V15H20v2.2h-1.5V20h-3.7L13 18.2H9.8V20H7.5v-1.8H5.2v-2.4H7V13H5.2v-2.4H7V9h1zm1.8 2.2v5.8h2.6l1.4 1.4h2.4v-1.6h-1.3l-1.5-1.5v-4.1h.9V9.8h-1.5l-1.2 1.4H9.8z"/>
+        </svg>
+      </button>
 
-      <div id="ind-damage" class="ind status green" title="Schade">
-        <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 4l7.5 13h-15L12 6zm-1 4h2v5h-2v-5zm0 6h2v2h-2v-2z"/></svg>
-        <span class="label">Schade</span>
-      </div>
-
-      <div id="ind-handbrake" class="ind handbrake" title="Handrem">
-        <svg viewBox="0 0 24 24"><path d="M8 4h8v2H8V4zm1 4h6l1 3h2v2h-1l-1.2 7H8.2L7 13H6v-2h2l1-3zm1.3 5l-.5 3h4.4l-.5-3H10.3z"/></svg>
-        <span class="label">Handrem</span>
-      </div>
-    </div>
-
-    <div class="bars">
-      <div class="bar">
-        <span>Motor</span>
-        <div class="bar-track"><div id="engine-bar" class="bar-fill green"></div></div>
-      </div>
-      <div class="bar">
-        <span>Carrosserie</span>
-        <div class="bar-track"><div id="body-bar" class="bar-fill green"></div></div>
-      </div>
+      <button type="button" id="ind-lights" class="icon lights" title="Lichten" tabindex="-1">
+        <svg viewBox="0 0 24 24">
+          <path fill="currentColor" d="M4 7.2c3.4 0 6.2 2.8 6.2 6.2S7.4 19.6 4 19.6V7.2zm8.4 1.3h8.2v1.6h-8.2zm0 3.5h8.2v1.6h-8.2zm0 3.5h8.2v1.6h-8.2z"/>
+        </svg>
+      </button>
     </div>
   </div>
 
-  <!-- Browser-demo (alleen zichtbaar buiten FiveM) -->
   <div id="demo" class="demo hidden">
     <h1>Speedometer demo</h1>
-    <p>Simuleer voertuigstatus voor preview</p>
-    <label>Snelheid <input id="demo-speed" type="range" min="0" max="280" value="72" /></label>
+    <p>Zelfde stijl als je voorbeeld</p>
+    <label>Snelheid <input id="demo-speed" type="range" min="0" max="280" value="67" /></label>
     <label>Motor
       <select id="demo-engine">
         <option value="green">Groen</option>
@@ -93,6 +90,7 @@
       <button type="button" data-toggle="hazard">Noodknippers</button>
       <button type="button" data-toggle="right">Rechts</button>
       <button type="button" data-toggle="handbrake">Handrem</button>
+      <button type="button" data-toggle="lights">Lichten</button>
     </div>
   </div>
 
