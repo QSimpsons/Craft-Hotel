@@ -37,71 +37,47 @@ body.demo-mode {
 
 .speedo {
   position: absolute;
-  right: 2.4vh;
+  left: 50%;
   bottom: 3.2vh;
-  width: 34vh;
-  padding: 2vh 2vh 1.6vh;
-  border-radius: 2vh;
+  transform: translateX(-50%) translateY(1.4vh) scale(0.96);
+  width: auto;
+  max-width: calc(100vw - 4vh);
+  padding: 1.1vh 1.6vh 1vh;
+  border-radius: 1.4vh;
   background: var(--panel);
   border: 1px solid var(--border);
   box-shadow: 0 1vh 2.4vh var(--shadow);
   opacity: 0;
-  transform: translateY(1.4vh) scale(0.96);
   pointer-events: none;
   transition: opacity 0.28s ease, transform 0.28s ease;
 }
 
 .speedo.visible {
   opacity: 1;
-  transform: translateY(0) scale(1);
+  transform: translateX(-50%) translateY(0) scale(1);
 }
 
-.gauge {
-  position: relative;
-  width: 24vh;
-  height: 24vh;
-  margin: 0 auto 1.4vh;
+.speedo-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7vh;
+  white-space: nowrap;
 }
 
-.gauge-ring {
-  width: 100%;
-  height: 100%;
-  transform: rotate(135deg);
-}
-
-.track {
-  fill: none;
-  stroke: url(#trackGrad);
-  stroke-width: 12;
-  stroke-linecap: round;
-  stroke-dasharray: 433;
-  stroke-dashoffset: 108;
-  opacity: 0.85;
-}
-
-.arc {
-  fill: none;
-  stroke: url(#arcGrad);
-  stroke-width: 12;
-  stroke-linecap: round;
-  stroke-dasharray: 433;
-  stroke-dashoffset: 433;
-  filter: drop-shadow(0 0 0.6vh rgba(255, 160, 60, 0.55));
-  transition: stroke-dashoffset 0.12s linear;
-}
-
-.gauge-core {
-  position: absolute;
-  inset: 0;
+.speed-block {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-width: 11vh;
+  padding: 0 1.2vh;
   text-align: center;
 }
 
 .speed {
-  font-size: 6.2vh;
+  font-size: 4.4vh;
   font-weight: 700;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -110,18 +86,41 @@ body.demo-mode {
 }
 
 .unit {
-  margin-top: 0.4vh;
-  font-size: 1.55vh;
+  margin-top: 0.15vh;
+  font-size: 1.2vh;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--muted);
 }
 
-.indicators {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.8vh;
-  margin-bottom: 1.2vh;
+.mini-arc {
+  width: 11vh;
+  height: 1.4vh;
+  margin-top: 0.45vh;
+}
+
+.track-line {
+  stroke: rgba(255, 196, 92, 0.28);
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.arc-line {
+  stroke: url(#arcGrad);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 112;
+  stroke-dashoffset: 112;
+  filter: drop-shadow(0 0 0.4vh rgba(255, 160, 60, 0.55));
+  transition: stroke-dashoffset 0.12s linear;
+}
+
+.divider {
+  width: 1px;
+  height: 4.2vh;
+  background: rgba(255, 200, 120, 0.22);
+  margin: 0 0.4vh;
+  flex-shrink: 0;
 }
 
 .ind {
@@ -129,24 +128,26 @@ body.demo-mode {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.35vh;
-  min-height: 5.2vh;
-  border-radius: 1vh;
+  gap: 0.25vh;
+  width: 5.4vh;
+  min-height: 5vh;
+  border-radius: 0.9vh;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 200, 120, 0.12);
   color: rgba(255, 236, 210, 0.28);
   transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  flex-shrink: 0;
 }
 
 .ind svg {
-  width: 2.2vh;
-  height: 2.2vh;
+  width: 2vh;
+  height: 2vh;
   fill: currentColor;
 }
 
 .ind .label {
-  font-size: 1.05vh;
-  letter-spacing: 0.06em;
+  font-size: 0.95vh;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -197,26 +198,32 @@ body.demo-mode {
 
 .bars {
   display: flex;
-  flex-direction: column;
-  gap: 0.7vh;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.4vh;
+  margin-top: 0.85vh;
+  justify-content: center;
 }
 
 .bar {
-  display: grid;
-  grid-template-columns: 8.5vh 1fr;
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 0.8vh;
-  font-size: 1.15vh;
+  gap: 0.7vh;
+  font-size: 1.05vh;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--muted);
+  min-width: 16vh;
 }
 
 .bar-track {
-  height: 0.7vh;
+  flex: 1;
+  height: 0.55vh;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
+  min-width: 8vh;
 }
 
 .bar-fill {
@@ -305,13 +312,26 @@ body.demo-mode {
 
 @media (max-width: 700px) {
   .speedo {
-    right: 50%;
-    transform: translateX(50%) translateY(1.4vh) scale(0.96);
-    bottom: 2vh;
-    width: min(86vw, 34vh);
+    bottom: 1.6vh;
+    padding: 0.9vh 1vh;
   }
 
-  .speedo.visible {
-    transform: translateX(50%) translateY(0) scale(1);
+  .ind {
+    width: 4.6vh;
+    min-height: 4.4vh;
+  }
+
+  .speed {
+    font-size: 3.6vh;
+  }
+
+  .bars {
+    flex-direction: column;
+    gap: 0.55vh;
+  }
+
+  .bar {
+    min-width: 0;
+    width: 100%;
   }
 }

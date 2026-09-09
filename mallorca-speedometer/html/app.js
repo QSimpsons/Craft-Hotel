@@ -1,6 +1,5 @@
 (() => {
-  const CIRC = 2 * Math.PI * 92;
-  const USABLE = CIRC * 0.75; // 270° boog
+  const ARC_LEN = 112; // lengte van de horizontale snelheidsbalk
 
   const el = {
     root: document.getElementById('speedo'),
@@ -48,7 +47,9 @@
 
     el.speed.textContent = String(Math.round(speed));
     el.unit.textContent = data.unit || 'km/h';
-    el.arc.style.strokeDashoffset = String(CIRC - USABLE * ratio);
+    if (el.arc) {
+      el.arc.style.strokeDashoffset = String(ARC_LEN - ARC_LEN * ratio);
+    }
 
     setActive(el.left, data.left);
     setActive(el.right, data.right);
