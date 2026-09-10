@@ -3,6 +3,11 @@ local leftIndicator = false
 local rightIndicator = false
 local hazardOn = false
 
+local currentPlate = nil
+local dbFuelLoaded = false
+local lastSaveAt = 0
+local lastFuelSaved = nil
+
 local function healthState(value, greenAt, yellowAt)
     if value >= greenAt then
         return 'green'
@@ -18,21 +23,23 @@ local function fuelState(percent)
     return healthState(percent, greenAt, yellowAt)
 end
 
-local function getFuelPercent(vehicle)
-    local cfg = Config.Fuel or {}
-    local resource = cfg.Resource
-    local exportName = cfg.Export or 'GetFuel'
+local function normalizePlate(plate)
+    if type(plate) ~= 'string' then
+        return ''
+    end
+    return (plate:gsub('^%s+', ''):gsub('%s+$', ''):upper())
+end
 
-    if type(resource) == 'string' and resource ~= '' and GetResourceState(resource) == 'started' then
-        local ok, value = pcall(function()
-            return exports[resource][exportName](vehicle)
-        end)
-        if ok and type(value) == 'number' then
-            return math.max(0.0, math.min(100.0, value + 0.0))
-        end
+local function getPlate(vehicle)
+    return normalizePlate(GetVehicleNumberPlateText(vehicle))
+end
+
+local function hasExternalFuel()
+    local cfg = Config.Fuel or {}
+    if type(cfg.Resource) == 'string' and cfg.Resource ~= '' and GetResourceState(cfg.Resource) == 'started' then
+        return true, cfg.Resource, cfg.Export or 'GetFuel'
     end
 
-    -- Fallbacks voor populaire fuel-scripts zonder config
     local fallbacks = {
         { 'LegacyFuel', 'GetFuel' },
         { 'ox_fuel', 'GetFuel' },
@@ -45,13 +52,34 @@ local function getFuelPercent(vehicle)
     for i = 1, #fallbacks do
         local name, exp = fallbacks[i][1], fallbacks[i][2]
         if GetResourceState(name) == 'started' then
-            local ok, value = pcall(function()
-                return exports[name][exp](vehicle)
-            end)
-            if ok and type(value) == 'number' then
-                return math.max(0.0, math.min(100.0, value + 0.0))
-            end
+            return true, name, exp
         end
+    end
+
+    return false
+end
+
+local function getExternalFuel(vehicle)
+    local okExt, resource, exportName = hasExternalFuel()
+    if not okExt then
+        return nil
+    end
+
+    local ok, value = pcall(function()
+        return exports[resource][exportName](vehicle)
+    end)
+
+    if ok and type(value) == 'number' then
+        return math.max(0.0, math.min(100.0, value + 0.0))
+    end
+
+    return nil
+end
+
+local function getFuelPercent(vehicle)
+    local external = getExternalFuel(vehicle)
+    if external ~= nil then
+        return external
     end
 
     local level = GetVehicleFuelLevel(vehicle)
@@ -59,6 +87,73 @@ local function getFuelPercent(vehicle)
         return 100.0
     end
     return math.max(0.0, math.min(100.0, level + 0.0))
+end
+
+local function setFuelLevel(vehicle, amount)
+    amount = math.max(0.0, math.min(100.0, amount + 0.0))
+    SetVehicleFuelLevel(vehicle, amount)
+
+    local okExt, resource = hasExternalFuel()
+    if okExt then
+        pcall(function()
+            if exports[resource].SetFuel then
+                exports[resource]:SetFuel(vehicle, amount)
+            end
+        end)
+    end
+end
+
+local function saveFuel(vehicle, force)
+    if not Config.Fuel or not Config.Fuel.UseDatabase then
+        return
+    end
+    if hasExternalFuel() then
+        return
+    end
+    if not vehicle or vehicle == 0 then
+        return
+    end
+
+    local plate = getPlate(vehicle)
+    if plate == '' then
+        return
+    end
+
+    local fuel = getFuelPercent(vehicle)
+    local now = GetGameTimer()
+    local saveMs = (Config.Fuel and Config.Fuel.SaveMs) or 15000
+
+    if not force then
+        if (now - lastSaveAt) < saveMs then
+            return
+        end
+        if lastFuelSaved ~= nil and math.abs(lastFuelSaved - fuel) < 0.5 then
+            return
+        end
+    end
+
+    lastSaveAt = now
+    lastFuelSaved = fuel
+    TriggerServerEvent('mallorca-speedometer:server:saveFuel', plate, fuel)
+end
+
+local function requestFuelFromDb(vehicle)
+    if not Config.Fuel or not Config.Fuel.UseDatabase then
+        return
+    end
+    if hasExternalFuel() then
+        dbFuelLoaded = true
+        return
+    end
+
+    local plate = getPlate(vehicle)
+    if plate == '' then
+        return
+    end
+
+    currentPlate = plate
+    dbFuelLoaded = false
+    TriggerServerEvent('mallorca-speedometer:server:getFuel', plate)
 end
 
 local function applyIndicators(vehicle)
@@ -105,12 +200,24 @@ local function getDriverVehicle()
     return vehicle
 end
 
+RegisterNetEvent('mallorca-speedometer:client:setFuel', function(plate, fuel)
+    plate = normalizePlate(plate)
+    if currentPlate ~= plate then
+        return
+    end
+
+    local vehicle = getDriverVehicle()
+    if vehicle ~= 0 then
+        setFuelLevel(vehicle, tonumber(fuel) or 100.0)
+    end
+    dbFuelLoaded = true
+end)
+
 local function isHandbrakeOn(vehicle)
     if GetVehicleHandbrake(vehicle) then
         return true
     end
-    -- Extra fallback terwijl je stilstaat met handrem-input
-    if IsControlPressed(0, 76) then -- INPUT_VEH_HANDBRAKE
+    if IsControlPressed(0, 76) then
         return true
     end
     return false
@@ -124,11 +231,55 @@ local function areLightsOn(vehicle)
     return lightsOn == 1 or highbeams == 1 or lightsOn == true or highbeams == true
 end
 
+local function consumeFuel(vehicle, dt)
+    if not Config.Fuel or Config.Fuel.Consume == false then
+        return
+    end
+    if hasExternalFuel() then
+        return
+    end
+    if not GetIsVehicleEngineRunning(vehicle) then
+        return
+    end
+
+    local speed = GetEntitySpeed(vehicle) * 3.6
+    local idle = (Config.Fuel.IdleDrain or 0.01) * dt
+    local drive = 0.0
+    if speed > 1.0 then
+        drive = ((Config.Fuel.DriveDrain or 0.035) + speed * (Config.Fuel.SpeedDrain or 0.00025)) * dt
+    end
+
+    local fuel = getFuelPercent(vehicle)
+    local nextFuel = math.max(0.0, fuel - idle - drive)
+    if math.abs(nextFuel - fuel) > 0.0001 then
+        setFuelLevel(vehicle, nextFuel)
+    end
+
+    if nextFuel <= 0.0 and GetIsVehicleEngineRunning(vehicle) then
+        SetVehicleEngineOn(vehicle, false, true, true)
+    end
+end
+
 CreateThread(function()
+    local wasInVehicle = false
+    local lastVehicle = 0
+    local lastTick = GetGameTimer()
+
     while true do
         local vehicle = getDriverVehicle()
+        local now = GetGameTimer()
+        local dt = math.max(0.0, (now - lastTick) / 1000.0)
+        lastTick = now
 
         if vehicle == 0 then
+            if wasInVehicle and lastVehicle ~= 0 then
+                saveFuel(lastVehicle, true)
+            end
+            wasInVehicle = false
+            lastVehicle = 0
+            currentPlate = nil
+            dbFuelLoaded = false
+
             if visible then
                 hideHud()
             end
@@ -140,6 +291,17 @@ CreateThread(function()
             hideHud()
             Wait(200)
         else
+            if not wasInVehicle or lastVehicle ~= vehicle then
+                requestFuelFromDb(vehicle)
+            end
+            wasInVehicle = true
+            lastVehicle = vehicle
+
+            if dbFuelLoaded or not (Config.Fuel and Config.Fuel.UseDatabase) or hasExternalFuel() then
+                consumeFuel(vehicle, dt)
+                saveFuel(vehicle, false)
+            end
+
             local speedRaw = GetEntitySpeed(vehicle)
             local speed = Config.UseKmh and (speedRaw * 3.6) or (speedRaw * 2.236936)
             local engineHealth = GetVehicleEngineHealth(vehicle)

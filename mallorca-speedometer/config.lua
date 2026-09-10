@@ -1,18 +1,13 @@
 Config = {}
 
--- km/h of mph
 Config.UseKmh = true
-
--- Max waarde op de snelheidsboog
 Config.MaxSpeed = 280
 
--- Motorstatus drempels (engine health 0–1000)
 Config.Engine = {
     green = 700,
     yellow = 300
 }
 
--- Carrosserieschade drempels (body health 0–1000)
 Config.Body = {
     green = 800,
     yellow = 400
@@ -20,12 +15,23 @@ Config.Body = {
 
 -- Tank / brandstof
 Config.Fuel = {
-    -- Leeg laten = native GetVehicleFuelLevel (0–100)
-    -- Of bv. 'LegacyFuel', 'ox_fuel', 'cdn-fuel', 'qs-fuelstations'
+    -- true = brandstof laden/opslaan via SQL (sql/install.sql + owned_vehicles.fuel)
+    UseDatabase = true,
+
+    -- Optioneel extern fuel-script (heeft voorrang op SQL/native)
+    -- Voorbeelden: 'LegacyFuel', 'ox_fuel', 'cdn-fuel'
     Resource = '',
-    -- Export-naam als je een fuel-script gebruikt (vaak 'GetFuel')
     Export = 'GetFuel',
-    -- Drempels in %
+
+    -- Verbruik per seconde bij stilstand / rijden (alleen als UseDatabase of native, zonder extern script)
+    Consume = true,
+    IdleDrain = 0.01,     -- % / sec stilstaand met motor aan
+    DriveDrain = 0.035,   -- % / sec basis terwijl je rijdt
+    SpeedDrain = 0.00025, -- extra % / sec per km/h
+
+    -- Hoe vaak opslaan naar SQL (ms)
+    SaveMs = 15000,
+
     green = 40,
     yellow = 15
 }
