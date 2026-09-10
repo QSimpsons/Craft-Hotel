@@ -1,10 +1,36 @@
-# Mallorca Speedometer
+# Mallorca Speedometer (compleet)
 
-FiveM HUD: snelheid, tank, motor, schade, pinkers, noodknippers, handrem en lichten.
+Complete FiveM-resource. Klaar om in `resources` te zetten.
+
+## Inhoud
+
+```
+mallorca-speedometer/
+├── fxmanifest.lua
+├── config.lua
+├── README.md
+├── client/
+│   └── main.lua
+└── html/
+    ├── index.html
+    ├── style.css
+    ├── app.js
+    ├── voorbeeld.html
+    └── auto-demo.html
+```
 
 ## Installatie
 
+1. Pak `mallorca-speedometer.zip` uit in je server-`resources` map  
+   (of kopieer de map `mallorca-speedometer` daarheen).
+2. Zet in `server.cfg`:
+
 ```cfg
+ensure mallorca-speedometer
+```
+
+3. Herstart de resource of de server:
+```
 ensure mallorca-speedometer
 ```
 
@@ -12,8 +38,8 @@ ensure mallorca-speedometer
 
 | Onderdeel | Werking |
 |-----------|---------|
-| Snelheid | km/h met boog |
-| **Tank** | Ronde meter + % (groen / geel / rood) |
+| Snelheid | km/h in **fluo oranje** met boog |
+| Tank | Ronde meter + % (groen / geel / rood) |
 | Motor | Groen / geel / rood |
 | Schade | Dim bij gezond, geel/rood bij schade |
 | Links / rechts | Knipperlichten |
@@ -36,9 +62,13 @@ Zonder config probeert de resource automatisch bekende fuel-scripts.
 
 ## Toetsen
 
-- Pijl links / rechts — pinkers  
-- Pijl omlaag — noodknippers  
+- **Pijl links / rechts** — pinkers  
+- **Pijl omlaag** — noodknippers  
 
-## Preview
+(Aanpasbaar in FiveM Key Bindings of `config.lua`.)
 
-Open `html/index.html` of `html/voorbeeld.html` in een browser.
+## Preview (zonder FiveM)
+
+Open in een browser:
+- `html/index.html` — interactieve demo
+- `html/voorbeeld.html` — auto-demo
