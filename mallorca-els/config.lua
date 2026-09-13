@@ -44,6 +44,9 @@ Config.UseHazardsFromStage = 2
 Config.HeadlightWigwag = false
 Config.ShowPanel = true
 
+-- Balk-emissives zonder geluid (veel addons zetten de 2e kant op de sirene-mesh)
+Config.MutedSirenLights = true
+
 -- Paneel verschijnt bij instappen, lampen blijven uit tot 1/2/3
 Config.StartStageOnEnter = 0
 

@@ -6,9 +6,8 @@ local extras = {}
 local leftExtras = {}
 local rightExtras = {}
 local savedExtras = {}
-local flashOn = false
-local remoteFlash = false
-local sweep = 1
+local strobe = 0
+local remoteStrobe = 0
 local profile = nil
 local remote = {}
 local remoteMeta = {}
@@ -30,9 +29,6 @@ local function extraExists(veh, extraId)
 end
 
 local function extraIsOn(veh, extraId)
-    if not extraExists(veh, extraId) then
-        return false
-    end
     if type(IsVehicleExtraTurnedOn) ~= 'function' then
         return false
     end
@@ -40,14 +36,29 @@ local function extraIsOn(veh, extraId)
 end
 
 local function setExtra(veh, extraId, enabled)
-    if not extraExists(veh, extraId) then
+    extraId = tonumber(extraId)
+    if not extraId or extraId < 1 or extraId > 14 then
         return
     end
-    if enabled then
-        SetVehicleExtra(veh, extraId, 0)
-    else
-        SetVehicleExtra(veh, extraId, 1)
-        SetVehicleExtra(veh, extraId, 1)
+    -- Addon-balken liegen vaak met DoesExtraExist; altijd zetten
+    SetVehicleExtra(veh, extraId, enabled and 0 or 1)
+end
+
+local function forceAllExtras(veh, on)
+    for extraId = 1, 14 do
+        setExtra(veh, extraId, on)
+    end
+end
+
+local function forceOddExtras(veh, on)
+    for extraId = 1, 13, 2 do
+        setExtra(veh, extraId, on)
+    end
+end
+
+local function forceEvenExtras(veh, on)
+    for extraId = 2, 14, 2 do
+        setExtra(veh, extraId, on)
     end
 end
 
@@ -120,21 +131,7 @@ local function disableAutoRepair(veh)
 end
 
 local function snapshotExtras(veh, cfg)
-    local wanted = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
-    if type(cfg.extras) == 'table' then
-        for i = 1, #cfg.extras do
-            wanted[#wanted + 1] = cfg.extras[i]
-        end
-    end
-    local seen = {}
-    local list = {}
-    for i = 1, #wanted do
-        local extraId = wanted[i]
-        if extraId and not seen[extraId] and extraExists(veh, extraId) then
-            seen[extraId] = true
-            list[#list + 1] = extraId
-        end
-    end
+    local list = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
     local saved = {}
     for i = 1, #list do
         saved[list[i]] = extraIsOn(veh, list[i])
@@ -191,27 +188,25 @@ local function sideGroups(veh, cfg, list)
 end
 
 local function alternateSides(veh, list, left, right, flash)
-    -- Eerst alles uit, anders blijft één kant vast branden
-    allExtras(veh, list, false)
-    if #left == 0 and #right == 0 then
-        allExtras(veh, list, flash)
-        return
-    end
-    if #left == 0 or #right == 0 then
-        allExtras(veh, list, flash)
-        return
-    end
-    if flash then
-        allExtras(veh, left, true)
-    else
-        allExtras(veh, right, true)
+    -- Addon-balken: extra 1 is vaak de voeding. Eerst HELE balk aan,
+    -- daarna één kant uit — zo branden beide kanten, met afwisseling.
+    local beat = math.floor(tonumber(flash) or 0) % 4
+    forceAllExtras(veh, true)
+    if beat == 1 then
+        forceOddExtras(veh, false)
+    elseif beat == 3 then
+        forceEvenExtras(veh, false)
     end
 end
 
-local function muteSiren(veh)
-    SetVehicleSiren(veh, false)
+local function muteSiren(veh, lightsOn)
     if type(SetVehicleHasMutedSirens) == 'function' then
         SetVehicleHasMutedSirens(veh, true)
+    end
+    if Config.MutedSirenLights and lightsOn then
+        SetVehicleSiren(veh, true)
+    else
+        SetVehicleSiren(veh, false)
     end
 end
 
@@ -258,16 +253,17 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
     local right = (meta and meta.right) or rightExtras
 
     if sceneOn then
-        allExtras(veh, list, true)
+        forceAllExtras(veh, true)
         setHazards(veh, true)
-        muteSiren(veh)
+        muteSiren(veh, false)
         return
     end
 
     if st <= 0 then
         restoreExtras(veh, saved)
+        forceAllExtras(veh, false)
         setHazards(veh, false)
-        muteSiren(veh)
+        muteSiren(veh, false)
         return
     end
 
@@ -276,18 +272,17 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
     setHazards(veh, false)
 
     if st == 1 then
-        local rear = rearExtras(list)
-        allExtras(veh, list, false)
-        allExtras(veh, rear, true)
-        muteSiren(veh)
+        forceAllExtras(veh, false)
+        forceEvenExtras(veh, true)
+        muteSiren(veh, false)
         return
     end
 
-    -- Links/rechts afwisselen: nooit beide kanten tegelijk
-    SetVehicleIndicatorLights(veh, 0, flash and true or false)
-    SetVehicleIndicatorLights(veh, 1, flash and false or true)
-    alternateSides(veh, list, left, right, flash)
-    muteSiren(veh)
+    local beat = math.floor(tonumber(flash) or 0)
+    SetVehicleIndicatorLights(veh, 0, (beat % 2) == 0)
+    SetVehicleIndicatorLights(veh, 1, (beat % 2) == 1)
+    alternateSides(veh, list, left, right, beat)
+    muteSiren(veh, true)
 end
 
 local function mineMeta()
@@ -341,10 +336,10 @@ local function armVehicle(veh, cfg)
     if start > 3 then start = 3 end
     stage = start
     scene = false
-    sweep = 1
+    strobe = 0
     disableAutoRepair(veh)
     if stage > 0 then
-        applyPattern(veh, stage, mineMeta(), true, flashOn, scene, sweep)
+        applyPattern(veh, stage, mineMeta(), true, strobe, scene, 0)
         broadcast()
     end
     pushUi()
@@ -363,7 +358,7 @@ local function setStage(nextStage)
     if stage <= 0 then
         scene = false
     end
-    applyPattern(veh, stage, mineMeta(), true, flashOn, scene, sweep)
+    applyPattern(veh, stage, mineMeta(), true, strobe, scene, 0)
     notify(('%s: %s'):format(Config.Locale.stage, Config.StageNames[stage] or 'UIT'))
     pushUi()
     broadcast()
@@ -379,7 +374,7 @@ local function toggleScene()
         armVehicle(veh, cfg)
     end
     scene = not scene
-    applyPattern(veh, stage, mineMeta(), true, flashOn, scene, sweep)
+    applyPattern(veh, stage, mineMeta(), true, strobe, scene, 0)
     notify(scene and Config.Locale.scene_on or Config.Locale.scene_off)
     pushUi()
     broadcast()
@@ -444,16 +439,16 @@ CreateThread(function()
                 armVehicle(veh, cfg)
             end
             if scene then
-                applyPattern(veh, stage, mineMeta(), true, flashOn, true, sweep)
+                applyPattern(veh, stage, mineMeta(), true, strobe, true, 0)
                 Wait(250)
             elseif stage <= 0 then
                 Wait(250)
             elseif stage >= 2 then
-                flashOn = not flashOn
-                applyPattern(veh, stage, mineMeta(), true, flashOn, false, sweep)
+                strobe = strobe + 1
+                applyPattern(veh, stage, mineMeta(), true, strobe, false, 0)
                 Wait(Config.FlashMs[stage] or 80)
             else
-                applyPattern(veh, stage, mineMeta(), true, flashOn, false, sweep)
+                applyPattern(veh, stage, mineMeta(), true, strobe, false, 0)
                 Wait(200)
             end
             pushUi()
@@ -467,7 +462,7 @@ CreateThread(function()
         local ped = PlayerPedId()
         local coords = GetEntityCoords(ped)
         local anyFlash = false
-        remoteFlash = not remoteFlash
+        remoteStrobe = remoteStrobe + 1
 
         for netId, data in pairs(remote) do
             local veh = NetworkGetEntityFromNetworkId(netId)
@@ -486,12 +481,12 @@ CreateThread(function()
                     end
                     local st = data.stage or 0
                     if data.scene then
-                        applyPattern(veh, st, remoteMeta[netId], false, remoteFlash, true, 1)
+                        applyPattern(veh, st, remoteMeta[netId], false, remoteStrobe, true, 1)
                     elseif st >= 2 then
                         anyFlash = true
-                        applyPattern(veh, st, remoteMeta[netId], false, remoteFlash, false, 1)
+                        applyPattern(veh, st, remoteMeta[netId], false, remoteStrobe, false, 1)
                     else
-                        applyPattern(veh, st, remoteMeta[netId], false, remoteFlash, false, 1)
+                        applyPattern(veh, st, remoteMeta[netId], false, remoteStrobe, false, 1)
                     end
                 end
             end

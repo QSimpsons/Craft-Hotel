@@ -17,8 +17,8 @@ Alleen als bestuurder van die twee wagens. Te voet: niets. Uitstappen: alles uit
 | Toets | Actie |
 |--------|--------|
 | **1** | Achterlichten |
-| **2** | Zwaai — links/rechts afwisselen (niks blijft vast aan) |
-| **3** | Vol — zelfde afwisseling, sneller, geen koplampen |
+| **2** | Zwaai — hele balk, daarna links/rechts |
+| **3** | Vol — sneller, geen koplampen |
 | **0** | Alles uit |
 | **R** | Werklicht |
 

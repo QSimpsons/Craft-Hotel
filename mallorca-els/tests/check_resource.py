@@ -68,8 +68,8 @@ if 'IsThisModelATowTruck' in lua:
     errors.append('client must not call IsThisModelATowTruck')
 if 'mallorca_els_siren' in lua or 'toggleSiren' in lua:
     errors.append('siren commands should be removed')
-if 'SetVehicleSiren(veh, true)' in lua or 'SetVehicleSiren(veh, on' in lua:
-    errors.append('client must not turn sirens on')
+if 'forceAllExtras' not in lua:
+    errors.append('client missing forceAllExtras')
 if 'SetVehicleLights(veh, flash and 2' in lua or 'SetVehicleLights(veh, 2)' in lua:
     errors.append('ELS must not flash or force headlights')
 if 'HeadlightWigwag = true' in (ROOT / 'config.lua').read_text(encoding='utf-8'):
