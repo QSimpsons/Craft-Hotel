@@ -4,7 +4,7 @@ game 'gta5'
 
 name 'jg-anwb'
 description 'ANWB / mechanic job'
-version '1.1.0'
+version '1.1.1'
 
 shared_scripts {
     '@es_extended/imports.lua',
@@ -31,5 +31,6 @@ escrow_ignore = {
     'config/config.lua',
     'config/outfits.lua',
     'config/fines.lua',
-    'client/keys.lua'
+    'client/keys.lua',
+    'client/client.lua'
 }

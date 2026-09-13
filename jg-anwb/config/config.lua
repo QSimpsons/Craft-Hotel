@@ -60,7 +60,7 @@ Config.Locations = {
     {
         coords = vector3(-357.3671, -129.5489, 39.4307),
         drawText = 'Garage',
-        functionDefine = OpenGarage,
+        functionDefine = 'OpenGarage',
         spawnPoints = {                   
             [1] = vector4(-369.2175, -122.8222, 38.6958, 21.6022),
         }
@@ -68,29 +68,29 @@ Config.Locations = {
     {
         coords = vector3(-367.4038, -113.1842, 38.6964),
         drawText = 'Voertuig wegzetten',
-        functionDefine = DeleteVehicle,
+        functionDefine = 'DeleteVehicle',
         deleteType = 'any',
     },
     { -- Beneden
         coords = vector3(-341.4538, -162.1770, 44.5875),
         drawText = 'Omkleden',
-        functionDefine = CloakroomMenu,
+        functionDefine = 'CloakroomMenu',
     },
     {
         coords = vector3(-331.4392, -156.8388, 39.0149),
         drawText = 'In-/uitklokken',
-        functionDefine = OnOffDuty,
+        functionDefine = 'OnOffDuty',
     },
     {
         coords = vector3(-351.53, -159.24, 39.02),
         drawText = 'Werkspullen pakken',
-        functionDefine = GetGear
+        functionDefine = 'GetGear'
     },
     {
         coords = vector3(-339.6403, -157.4421, 44.5871),
         rank = 5,
         drawText = 'Baas acties',
-        functionDefine = OpenManagement,
+        functionDefine = 'OpenManagement',
     },
 	-- {
     --     drawText = 'Management openen',

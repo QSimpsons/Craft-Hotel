@@ -77,6 +77,40 @@ SafeSetFuel = function(vehicle, amount)
 	return true
 end
 
+-- Config werd eerder geladen dan deze functies, daardoor was functionDefine nil.
+RunLocationAction = function(location, locType, locId)
+	if type(location) ~= 'table' then
+		return
+	end
+
+	local handlers = {
+		OpenGarage = OpenGarage,
+		DeleteVehicle = DeleteVehicle,
+		CloakroomMenu = CloakroomMenu,
+		OnOffDuty = OnOffDuty,
+		GetGear = GetGear,
+		OpenManagement = OpenManagement,
+		ManagementMenu = OpenManagement,
+		['Garage'] = OpenGarage,
+		['Voertuig wegzetten'] = DeleteVehicle,
+		['Omkleden'] = CloakroomMenu,
+		['In-/uitklokken'] = OnOffDuty,
+		['Werkspullen pakken'] = GetGear,
+		['Baas acties'] = OpenManagement,
+	}
+
+	local fn = location.functionDefine
+	if type(fn) == 'string' then
+		fn = handlers[fn] or _G[fn]
+	end
+	if type(fn) ~= 'function' then
+		fn = handlers[location.drawText]
+	end
+	if type(fn) == 'function' then
+		fn(locType or location.type or 'default', locId)
+	end
+end
+
 DrawBlips = function()
 	for i=1, #Config.Blips, 1 do
 		local v = Config.Blips[i]
@@ -163,7 +197,7 @@ Citizen.CreateThread(function()
 								if IsControlJustReleased(0, 38) then
 									if v.type == nil then v.type = 'default' end
 
-									v['functionDefine'](v.type, k);
+									RunLocationAction(v, v.type, k)
 								end
 							end
 						end
@@ -190,7 +224,7 @@ Citizen.CreateThread(function()
 							if IsControlJustReleased(0, 38) then
 								if v.type == nil then v.type = 'default' end
 
-								v['functionDefine'](v.type, k);
+								RunLocationAction(v, v.type, k)
 							end
 						end
 					end
