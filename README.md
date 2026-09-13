@@ -1,4 +1,4 @@
-# GianniJ
+# Snelle
 
 ## Resources
 
