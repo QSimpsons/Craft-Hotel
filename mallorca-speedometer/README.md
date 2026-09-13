@@ -1,41 +1,48 @@
 # Mallorca Speedometer
 
-FiveM voertuig-HUD met snelheid, motorstatus, carrosserieschade, knipperlichten, noodknippers en handrem.
+Complete FiveM voertuig-HUD.
 
-## Installatie
+## Snelle installatie
 
-1. Kopieer de map `mallorca-speedometer` naar je `resources` folder.
-2. Voeg toe aan `server.cfg`:
+1. Map `mallorca-speedometer` in `resources` zetten  
+2. `sql/install.sql` uitvoeren in je database  
+3. In `server.cfg`:
 
 ```cfg
+ensure oxmysql
 ensure mallorca-speedometer
 ```
 
-3. Herstart de resource of de server.
+Zie ook `INSTALL.txt`.
 
-## Wat zie je
+## Functies
 
-| Indicator | Betekenis |
-|-----------|-----------|
-| **Snelheid** | Huidige snelheid in km/h |
-| **Motor** | Groen / geel / rood op basis van engine health |
-| **Schade** | Groen / geel / rood op basis van body health |
-| **Links / Rechts** | Knipperlichten (knipperen oranje) |
-| **Noodknippers** | Beide richtingaanwijzers (rood/oranje) |
-| **Handrem** | Wordt rood als de handrem erop staat |
+| Onderdeel | Status |
+|-----------|--------|
+| Snelheid (fluo oranje) | ✅ |
+| Tankmeter + % | ✅ |
+| Tank opslaan in SQL | ✅ `owned_vehicles.fuel` |
+| Motor groen/geel/rood | ✅ |
+| Schade | ✅ |
+| Links / rechts pinker | ✅ |
+| Noodknippers | ✅ |
+| Handrem (rood) | ✅ |
+| Lichten | ✅ |
 
-## Bediening (standaard)
+## Toetsen
 
-- **Pijl links** — knipperlicht links
-- **Pijl rechts** — knipperlicht rechts
-- **Pijl omlaag** — noodknippers aan/uit
+- **← / →** pinkers  
+- **↓** noodknippers  
 
-Toetsen aanpassen via FiveM instellingen (Key Bindings → FiveM) of in `config.lua`.
+## Config brandstof
 
-## Config
+```lua
+Config.Fuel.UseDatabase = true
+Config.Fuel.Consume = true
+Config.Fuel.Resource = ''          -- of 'LegacyFuel' / 'ox_fuel'
+Config.Fuel.Export = 'GetFuel'
+```
 
-Zie `config.lua` voor eenheden (km/h of mph), max snelheid op de meter, drempels voor groen/geel/rood en refresh-snelheid.
+## Preview
 
-## Browser demo
-
-Open `html/index.html` in een browser om de UI te testen zonder FiveM.
+Open `html/index.html` in een browser.

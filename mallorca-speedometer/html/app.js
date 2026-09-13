@@ -1,8 +1,8 @@
 (() => {
-  // r=48, 75% van cirkel (270°)
   const ARC_TOTAL = 2 * Math.PI * 48;
   const ARC_VISIBLE = ARC_TOTAL * 0.75;
   const ARC_HIDDEN = ARC_TOTAL - ARC_VISIBLE;
+  const FUEL_CIRC = 2 * Math.PI * 17;
 
   const el = {
     root: document.getElementById('speedo'),
@@ -16,13 +16,19 @@
     damage: document.getElementById('ind-damage'),
     handbrake: document.getElementById('ind-handbrake'),
     lights: document.getElementById('ind-lights'),
+    fuel: document.getElementById('fuel'),
+    fuelArc: document.getElementById('fuel-arc'),
+    fuelPct: document.getElementById('fuel-pct'),
     demo: document.getElementById('demo'),
   };
 
-  // init stroke
   if (el.arc) {
     el.arc.style.strokeDasharray = String(ARC_TOTAL);
     el.arc.style.strokeDashoffset = String(ARC_TOTAL);
+  }
+  if (el.fuelArc) {
+    el.fuelArc.style.strokeDasharray = String(FUEL_CIRC);
+    el.fuelArc.style.strokeDashoffset = '0';
   }
 
   const state = {
@@ -44,6 +50,27 @@
     node.classList.add(status || 'green');
   }
 
+  function fuelStatus(percent, explicit) {
+    if (explicit) return explicit;
+    if (percent >= 40) return 'green';
+    if (percent >= 15) return 'yellow';
+    return 'red';
+  }
+
+  function setFuel(percent, status) {
+    const p = Math.max(0, Math.min(100, Number(percent) || 0));
+    const st = fuelStatus(p, status);
+    if (el.fuelPct) el.fuelPct.textContent = `${Math.round(p)}%`;
+    if (el.fuelArc) {
+      el.fuelArc.style.strokeDashoffset = String(FUEL_CIRC * (1 - p / 100));
+    }
+    if (el.fuel) {
+      el.fuel.classList.remove('green', 'yellow', 'red');
+      el.fuel.classList.add(st);
+      el.fuel.title = `Brandstof ${Math.round(p)}%`;
+    }
+  }
+
   function update(data = {}) {
     const max = Number(data.maxSpeed) || 280;
     const speed = Math.max(0, Math.min(max, Number(data.speed) || 0));
@@ -53,7 +80,6 @@
     el.unit.textContent = (data.unit || 'km/h').toUpperCase();
 
     if (el.arc) {
-      // start vanaf verborgen deel, vul zichtbare boog
       el.arc.style.strokeDashoffset = String(ARC_HIDDEN + ARC_VISIBLE * (1 - ratio));
     }
 
@@ -64,9 +90,10 @@
 
     setStatus(el.engine, data.engine);
     setStatus(el.damage, data.damage);
+    setFuel(data.fuel != null ? data.fuel : 100, data.fuelState);
 
     if (el.lights) {
-      el.lights.classList.toggle('on', data.lights !== false);
+      el.lights.classList.toggle('on', !!data.lights);
     }
 
     el.root.classList.add('visible');
@@ -92,12 +119,15 @@
     const syncDemo = () => {
       const engine = document.getElementById('demo-engine').value;
       const damage = document.getElementById('demo-damage').value;
+      const fuel = Number(document.getElementById('demo-fuel').value);
       update({
         speed: Number(document.getElementById('demo-speed').value),
         maxSpeed: 280,
         unit: 'km/h',
         engine,
         damage,
+        fuel,
+        fuelState: fuelStatus(fuel),
         left: state.left || state.hazard,
         right: state.right || state.hazard,
         hazard: state.hazard,
@@ -107,6 +137,7 @@
     };
 
     document.getElementById('demo-speed').addEventListener('input', syncDemo);
+    document.getElementById('demo-fuel').addEventListener('input', syncDemo);
     document.getElementById('demo-engine').addEventListener('change', syncDemo);
     document.getElementById('demo-damage').addEventListener('change', syncDemo);
 
@@ -141,7 +172,6 @@
       });
     });
 
-    // default lights button active
     const lightsBtn = el.demo.querySelector('[data-toggle="lights"]');
     if (lightsBtn) lightsBtn.classList.add('active');
     syncDemo();

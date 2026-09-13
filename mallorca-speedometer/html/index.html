@@ -9,7 +9,6 @@
 <body>
   <div id="speedo" class="speedo" aria-hidden="true">
     <div class="row">
-      <!-- Links: handrem + pinkers -->
       <button type="button" id="ind-handbrake" class="icon" title="Handrem" tabindex="-1">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
@@ -32,7 +31,6 @@
         <svg viewBox="0 0 24 24"><path fill="currentColor" d="M8.8 5.2 17 12l-8.2 6.8V14H3.5V10h5.3V5.2z"/></svg>
       </button>
 
-      <!-- Midden: snelheid met bogen -->
       <div class="speed-wrap">
         <svg class="arcs" viewBox="0 0 120 120" aria-hidden="true">
           <circle class="arc-track" cx="60" cy="60" r="48" />
@@ -45,7 +43,18 @@
         </div>
       </div>
 
-      <!-- Rechts: schade + motor -->
+      <!-- Tankmeter -->
+      <div id="fuel" class="fuel" title="Brandstof">
+        <svg class="fuel-ring" viewBox="0 0 44 44" aria-hidden="true">
+          <circle class="fuel-track" cx="22" cy="22" r="17" />
+          <circle id="fuel-arc" class="fuel-fill" cx="22" cy="22" r="17" />
+        </svg>
+        <svg class="fuel-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M5 3h8a2 2 0 0 1 2 2v12h2.2A1.8 1.8 0 0 0 19 15.2V9.4l-1.7-1.7 1.1-1.1L21 9.2v6A3.2 3.2 0 0 1 17.8 18.4H15v2H4V5a2 2 0 0 1 1-2zm2 2v10h6V5H7z"/>
+        </svg>
+        <span id="fuel-pct" class="fuel-pct">100%</span>
+      </div>
+
       <button type="button" id="ind-damage" class="icon status green" title="Schade" tabindex="-1">
         <svg viewBox="0 0 24 24">
           <path fill="currentColor" d="M12 2.8 2.2 20.6h19.6L12 2.8zm0 3.8 6.6 11.8H5.4L12 6.6z"/>
@@ -69,8 +78,9 @@
 
   <div id="demo" class="demo hidden">
     <h1>Speedometer demo</h1>
-    <p>Zelfde stijl als je voorbeeld</p>
+    <p>Test tank, motor, schade, pinkers en handrem</p>
     <label>Snelheid <input id="demo-speed" type="range" min="0" max="280" value="67" /></label>
+    <label>Tank % <input id="demo-fuel" type="range" min="0" max="100" value="72" /></label>
     <label>Motor
       <select id="demo-engine">
         <option value="green">Groen</option>
