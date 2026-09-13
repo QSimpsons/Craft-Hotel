@@ -15,7 +15,7 @@ ensure mallorca-els
 
 3. `ensure mallorca-els` of herstart de server.
 
-Geen SQL, geen job-check: als je bestuurder bent van die twee wagens werkt ELS.
+Geen SQL, geen job-check. ELS **gaat alleen aan als je instapt** als bestuurder van `fmltow` of `dlbrickade`. Te voet of in een andere auto gebeurt er niets: geen lampen, geen sirene, geen paneel. Stap je uit, dan gaat alles uit.
 
 ## Bediening
 

@@ -49,6 +49,8 @@ for needle in (
     'mallorca_els_siren',
     'fmltow',
     'dlbrickade',
+    'driverVehicle',
+    'resetMine',
 ):
     if needle not in lua:
         errors.append('client missing ' + needle)

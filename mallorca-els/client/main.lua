@@ -284,16 +284,13 @@ local function armVehicle(veh, cfg)
     stage = 0
     siren = false
     disableAutoRepair(veh)
-    applyPattern(veh, 0, mineMeta(), true, false)
     pushUi()
-    broadcast()
 end
 
 local function cycleStage()
     local veh = driverVehicle()
     local ok, cfg = isPechhulp(veh)
     if not ok then
-        notify(Config.Locale.no_vehicle)
         return
     end
     if myVehicle ~= veh then
@@ -317,7 +314,6 @@ local function toggleSiren()
     local veh = driverVehicle()
     local ok, cfg = isPechhulp(veh)
     if not ok then
-        notify(Config.Locale.no_vehicle)
         return
     end
     if myVehicle ~= veh then
@@ -389,7 +385,9 @@ CreateThread(function()
                 end
                 armVehicle(veh, cfg)
             end
-            if stage >= 2 then
+            if stage <= 0 then
+                Wait(250)
+            elseif stage >= 2 then
                 flashOn = not flashOn
                 applyPattern(veh, stage, mineMeta(), true, flashOn)
                 Wait(Config.FlashMs[stage] or 160)
