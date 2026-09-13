@@ -10,10 +10,10 @@ Mallorca ELS — pechhulp (alleen fmltow + dlbrickade)
 
 3. restart mallorca-els
 
-In de fmltow of dlbrickade (bestuurder) — pas NA instappen:
-Q = zwaailichten (uit / cruise / waarschuwing / vol)
-G = sirene (vanaf waarschuwing)
-Claxon = korte sirene
+In de fmltow of dlbrickade (bestuurder):
+- Instappen = ELS gaat aan (cruise + paneel)
+- Uitstappen = ELS gaat uit
+- Q = zwaailichten cyclen
+- G = sirene (vanaf waarschuwing)
 
 Te voet of in een andere auto: geen ELS.
-Stap je uit: lampen en sirene uit.

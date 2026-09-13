@@ -23,6 +23,7 @@ html, body {
 
 body.demo-mode {
   background: linear-gradient(180deg, #1a120c, #0a0705);
+  pointer-events: auto;
 }
 
 body.demo-mode::before {
@@ -34,6 +35,45 @@ body.demo-mode::before {
   font-weight: 700;
   color: var(--gold);
   letter-spacing: 0.04em;
+}
+
+.gate {
+  display: none;
+  position: absolute;
+  top: 8vh;
+  left: 3vh;
+  width: 42vh;
+  pointer-events: auto;
+}
+
+.gate:not([hidden]) {
+  display: block;
+}
+
+.gate p {
+  color: var(--muted);
+  font-size: 1.5vh;
+  margin-bottom: 1.2vh;
+}
+
+.gate button {
+  pointer-events: auto;
+  appearance: none;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--accent), #e85d04);
+  color: #1a0d06;
+  border-radius: 0.8vh;
+  padding: 0.8vh 1.4vh;
+  font: inherit;
+  font-size: 1.4vh;
+  font-weight: 700;
+  margin-right: 0.8vh;
+  cursor: pointer;
+}
+
+.gate button#exit {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
 }
 
 .panel {

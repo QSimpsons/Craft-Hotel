@@ -46,8 +46,11 @@ Config.SirenNeedsLights = true
 -- Claxon (E / hoorn) = korte sirene zolang je indrukt, als de sirene zelf uit staat
 Config.HornOverride = true
 
--- HUD-paneel tonen als je bestuurder bent
+-- HUD-paneel alleen tonen als je in de wagen zit
 Config.ShowPanel = true
+
+-- ELS gaat aan bij instappen (1 = cruise). 0 = paneel wel, lampen nog uit
+Config.StartStageOnEnter = 1
 
 Config.Locale = {
     no_vehicle = 'ELS werkt alleen in de fmltow of dlbrickade.',

@@ -32,6 +32,8 @@ if cfg.count('[`') != 2:
     errors.append('ELS config must whitelist exactly two vehicle models')
 if "stage = 'Q'" not in cfg or "siren = 'G'" not in cfg:
     errors.append('config keys must be Q (lights) and G (siren)')
+if 'StartStageOnEnter' not in cfg:
+    errors.append('config missing StartStageOnEnter')
 
 manifest = (ROOT / 'fxmanifest.lua').read_text(encoding='utf-8')
 for needle in ("ui_page 'html/index.html'", 'client/main.lua', 'server/main.lua', 'config.lua'):
@@ -49,8 +51,11 @@ for needle in (
     'mallorca_els_siren',
     'fmltow',
     'dlbrickade',
-    'driverVehicle',
+    'seatedDriver',
     'resetMine',
+    'StartStageOnEnter',
+    'onClientResourceStart',
+    'hideUi',
 ):
     if needle not in lua:
         errors.append('client missing ' + needle)
@@ -65,12 +70,12 @@ for needle in ('mallorca-els:update', 'mallorca-els:apply', 'fmltow', 'dlbrickad
         errors.append('server missing ' + needle)
 
 html = (ROOT / 'html/index.html').read_text(encoding='utf-8')
-for needle in ('Wegenwacht ELS', 'data-stage', 'siren', 'fmltow'):
+for needle in ('Wegenwacht ELS', 'data-stage', 'siren', 'fmltow', 'Instappen', 'Uitstappen'):
     if needle not in html:
         errors.append(f'html missing {needle}')
 
 js = (ROOT / 'html/app.js').read_text(encoding='utf-8')
-for needle in ('stageName', 'siren', 'GetParentResourceName'):
+for needle in ('stageName', 'siren', 'GetParentResourceName', 'hidePanel', 'seated'):
     if needle not in js:
         errors.append(f'app.js missing {needle}')
 

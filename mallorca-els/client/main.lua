@@ -81,16 +81,30 @@ local function isPechhulp(veh)
     return cfg ~= nil, cfg
 end
 
-local function driverVehicle()
+local function seatedDriver()
     local ped = PlayerPedId()
     if not IsPedInAnyVehicle(ped, false) then
         return 0
     end
     local veh = GetVehiclePedIsIn(ped, false)
+    if veh == 0 or not DoesEntityExist(veh) then
+        return 0
+    end
+    if not IsPedInVehicle(ped, veh, false) then
+        return 0
+    end
     if GetPedInVehicleSeat(veh, -1) ~= ped then
         return 0
     end
     return veh
+end
+
+local function driverVehicle()
+    return seatedDriver()
+end
+
+local function hideUi()
+    SendNUIMessage({ action = 'hide' })
 end
 
 local function disableAutoRepair(veh)
@@ -139,14 +153,16 @@ local function setOwnerSiren(veh, on)
 end
 
 local function pushUi()
-    if not Config.ShowPanel then
-        SendNUIMessage({ action = 'hide' })
+    local veh = seatedDriver()
+    local inTruck = veh ~= 0 and veh == myVehicle and isPechhulp(veh)
+    if not Config.ShowPanel or not inTruck then
+        hideUi()
         return
     end
     SendNUIMessage({
-        action = (myVehicle ~= 0) and 'show' or 'hide',
+        action = 'show',
         data = {
-            visible = myVehicle ~= 0,
+            visible = true,
             stage = stage,
             stageName = Config.StageNames[stage] or 'UIT',
             siren = siren,
@@ -263,7 +279,7 @@ local function resetMine(veh)
     groupB = {}
     savedExtras = {}
     profile = nil
-    SendNUIMessage({ action = 'hide' })
+    hideUi()
 end
 
 local function armVehicle(veh, cfg)
@@ -281,9 +297,16 @@ local function armVehicle(veh, cfg)
     extras, savedExtras = snapshotExtras(veh, cfg)
     groupA = filterExisting(veh, cfg.groupA)
     groupB = filterExisting(veh, cfg.groupB)
-    stage = 0
+    local start = math.floor(tonumber(Config.StartStageOnEnter) or 0)
+    if start < 0 then start = 0 end
+    if start > 3 then start = 3 end
+    stage = start
     siren = false
     disableAutoRepair(veh)
+    if stage > 0 then
+        applyPattern(veh, stage, mineMeta(), true, flashOn)
+        broadcast()
+    end
     pushUi()
 end
 
@@ -374,6 +397,7 @@ CreateThread(function()
         local veh = driverVehicle()
         local ok, cfg = isPechhulp(veh)
         if not ok then
+            hideUi()
             if myVehicle ~= 0 then
                 resetMine(myVehicle)
             end
@@ -435,6 +459,17 @@ CreateThread(function()
         end
         Wait(waitMs)
     end
+end)
+
+AddEventHandler('onClientResourceStart', function(res)
+    if res ~= GetCurrentResourceName() then
+        return
+    end
+    hideUi()
+    stage = 0
+    siren = false
+    myVehicle = 0
+    myNetId = 0
 end)
 
 AddEventHandler('onResourceStop', function(res)
