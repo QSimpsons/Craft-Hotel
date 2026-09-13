@@ -30,8 +30,10 @@ if re.search(r'\[`towtruck', cfg) or re.search(r'\[`flatbed', cfg):
     errors.append('vanilla tow vehicles should not be in ELS config')
 if cfg.count('[`') != 2:
     errors.append('ELS config must whitelist exactly two vehicle models')
-if "stage1 = '1'" not in cfg or "siren = 'G'" not in cfg or "scene = 'R'" not in cfg:
-    errors.append('config keys must be 1/2/3/0, G and R')
+if "stage1 = '1'" not in cfg or "scene = 'R'" not in cfg:
+    errors.append('config keys must be 1/2/3/0 and R')
+if "siren = 'G'" in cfg:
+    errors.append('siren key should be removed')
 
 manifest = (ROOT / 'fxmanifest.lua').read_text(encoding='utf-8')
 for needle in ("ui_page 'html/index.html'", 'client/main.lua', 'server/main.lua', 'config.lua'):
@@ -42,9 +44,8 @@ lua = (ROOT / 'client/main.lua').read_text(encoding='utf-8')
 for needle in (
     'local function extraExists',
     'setStage',
-    'toggleSiren',
     'toggleScene',
-    'SetVehicleSiren',
+    'muteSiren',
     'DoesExtraExist',
     'mallorca_els_1',
     'mallorca_els_2',
@@ -63,8 +64,10 @@ for needle in (
         errors.append('client missing ' + needle)
 if 'IsThisModelATowTruck' in lua:
     errors.append('client must not call IsThisModelATowTruck')
-if 'cycleStage' in lua:
-    errors.append('old Q-cycle ELS should be replaced')
+if 'mallorca_els_siren' in lua or 'toggleSiren' in lua:
+    errors.append('siren commands should be removed')
+if 'SetVehicleSiren(veh, true)' in lua or 'SetVehicleSiren(veh, on' in lua:
+    errors.append('client must not turn sirens on')
 if lua.find('local function extraExists') > lua.find('local function extraIsOn'):
     errors.append('extraExists must be defined before extraIsOn')
 
@@ -74,9 +77,11 @@ for needle in ('mallorca-els:update', 'mallorca-els:apply', 'fmltow', 'dlbrickad
         errors.append('server missing ' + needle)
 
 html = (ROOT / 'html/index.html').read_text(encoding='utf-8')
-for needle in ('PECHHULP', 'ACHTER', 'ZWAAI', 'WERK', 'TOON', 'Instappen', 'Uitstappen'):
+for needle in ('PECHHULP', 'ACHTER', 'ZWAAI', 'WERK', 'Instappen', 'Uitstappen'):
     if needle not in html:
         errors.append(f'html missing {needle}')
+if 'TOON' in html or 'siren' in html:
+    errors.append('html still has siren/toon UI')
 
 js = (ROOT / 'html/app.js').read_text(encoding='utf-8')
 for needle in ('stageName', 'scene', 'GetParentResourceName', 'hidePanel', 'seated', 'sweep'):

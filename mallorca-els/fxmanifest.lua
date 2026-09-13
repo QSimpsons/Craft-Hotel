@@ -3,7 +3,7 @@ game 'gta5'
 lua54 'yes'
 
 author 'Mallorca Roleplay'
-description 'Pechhulp ELS-schakelkast: alleen fmltow en dlbrickade'
+description 'Pechhulp licht-ELS zonder sirene: alleen fmltow en dlbrickade'
 version '2.0.0'
 
 ui_page 'html/index.html'

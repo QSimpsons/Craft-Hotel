@@ -18,7 +18,6 @@ RegisterNetEvent('mallorca-els:update', function(netId, payload)
 
     local data = {
         stage = clampStage(payload.stage),
-        siren = payload.siren == true,
         scene = payload.scene == true,
         model = tostring(payload.model or '')
     }

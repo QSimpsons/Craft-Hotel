@@ -11,6 +11,6 @@ Alleen als bestuurder in die wagen:
 3 = vol
 0 = uit
 R = werklicht
-G = toon
 
+Geen sirene.
 Te voet: geen ELS. Uitstappen: alles uit.

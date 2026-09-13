@@ -1,6 +1,6 @@
 # Mallorca ELS — pechhulp schakelkast
 
-Ander ELS dan de oude Q-cyclus. Dit is een **schakelkast** alleen voor **fmltow** en **dlbrickade**.
+Licht-ELS **zonder sirene**, alleen voor **fmltow** en **dlbrickade**.
 
 ## Installatie
 
@@ -10,24 +10,22 @@ ensure dlbrickade
 ensure mallorca-els
 ```
 
-ELS is alleen beschikbaar als je **bestuurder** bent van die twee wagens. Te voet: niets. Uitstappen: alles uit.
-
-Bij instappen verschijnt de kast rechtsboven; lampen blijven uit tot je een stand kiest.
+Alleen als bestuurder van die twee wagens. Te voet: niets. Uitstappen: alles uit.
 
 ## Bediening
 
 | Toets | Actie |
 |--------|--------|
-| **1** | Achterlichten (park/waarschuwing achter) |
-| **2** | Zwaailichten (lopende sweep) |
-| **3** | Vol (snel knipperen + koplampen) |
+| **1** | Achterlichten |
+| **2** | Zwaailichten (sweep) |
+| **3** | Vol (knipperen + koplampen) |
 | **0** | Alles uit |
-| **R** | Werklicht (alles vast aan, voor pech langs de weg) |
-| **G** | Toon / sirene (vanaf stand 2) |
-| Claxon | Korte toon zolang je indrukt |
+| **R** | Werklicht |
 
-`/els` toont de toetsen in chat. Aanpassen: FiveM → Key Bindings → Pechhulp ELS.
+Geen sirene, geen toon, geen claxon-override.
+
+`/els` toont de toetsen in chat.
 
 ## Browserdemo
 
-Open `html/index.html` → **Instappen** om de kast te zien.
+Open `html/index.html` → **Instappen**.

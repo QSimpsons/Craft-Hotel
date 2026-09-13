@@ -1,7 +1,6 @@
 local myVehicle = 0
 local myNetId = 0
 local stage = 0
-local siren = false
 local scene = false
 local extras = {}
 local savedExtras = {}
@@ -157,10 +156,10 @@ local function rearExtras(list)
     return out
 end
 
-local function setOwnerSiren(veh, on)
-    SetVehicleSiren(veh, on and true or false)
+local function muteSiren(veh)
+    SetVehicleSiren(veh, false)
     if type(SetVehicleHasMutedSirens) == 'function' then
-        SetVehicleHasMutedSirens(veh, false)
+        SetVehicleHasMutedSirens(veh, true)
     end
 end
 
@@ -177,7 +176,6 @@ local function pushUi()
             visible = true,
             stage = stage,
             stageName = Config.StageNames[stage] or 'UIT',
-            siren = siren,
             scene = scene,
             vehicle = profile and profile.label or '',
             model = modelName(myVehicle) or 'fmltow / dlbrickade'
@@ -191,7 +189,6 @@ local function broadcast()
     end
     TriggerServerEvent('mallorca-els:update', myNetId, {
         stage = stage,
-        siren = siren,
         scene = scene,
         model = modelName(myVehicle) or ''
     })
@@ -210,9 +207,7 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
         allExtras(veh, list, true)
         setHazards(veh, true)
         SetVehicleLights(veh, 2)
-        if isOwner then
-            setOwnerSiren(veh, false)
-        end
+        muteSiren(veh)
         return
     end
 
@@ -220,9 +215,7 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
         restoreExtras(veh, saved)
         setHazards(veh, false)
         SetVehicleLights(veh, 0)
-        if isOwner then
-            setOwnerSiren(veh, false)
-        end
+        muteSiren(veh)
         return
     end
 
@@ -234,9 +227,7 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
         allExtras(veh, list, false)
         allExtras(veh, rear, true)
         SetVehicleLights(veh, 0)
-        if isOwner then
-            setOwnerSiren(veh, false)
-        end
+        muteSiren(veh)
         return
     end
 
@@ -263,10 +254,7 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
         end
     end
 
-    if isOwner then
-        local horn = Config.HornOverride and IsControlPressed(0, 86)
-        setOwnerSiren(veh, siren or (st >= 2 and horn))
-    end
+    muteSiren(veh)
 end
 
 local function mineMeta()
@@ -278,14 +266,12 @@ end
 
 local function resetMine(veh)
     stage = 0
-    siren = false
     scene = false
     if veh ~= 0 and DoesEntityExist(veh) then
         applyPattern(veh, 0, mineMeta(), true, false, false, 1)
         if myNetId ~= 0 then
             TriggerServerEvent('mallorca-els:update', myNetId, {
                 stage = 0,
-                siren = false,
                 scene = false,
                 model = modelName(veh) or ''
             })
@@ -316,7 +302,6 @@ local function armVehicle(veh, cfg)
     if start < 0 then start = 0 end
     if start > 3 then start = 3 end
     stage = start
-    siren = false
     scene = false
     sweep = 1
     disableAutoRepair(veh)
@@ -337,37 +322,11 @@ local function setStage(nextStage)
         armVehicle(veh, cfg)
     end
     stage = nextStage
-    if stage < 2 then
-        siren = false
-    end
     if stage <= 0 then
         scene = false
     end
     applyPattern(veh, stage, mineMeta(), true, flashOn, scene, sweep)
     notify(('%s: %s'):format(Config.Locale.stage, Config.StageNames[stage] or 'UIT'))
-    pushUi()
-    broadcast()
-end
-
-local function toggleSiren()
-    local veh = driverVehicle()
-    local ok, cfg = isPechhulp(veh)
-    if not ok then
-        return
-    end
-    if myVehicle ~= veh then
-        armVehicle(veh, cfg)
-    end
-    if scene then
-        return
-    end
-    if Config.SirenNeedsLights and stage < 2 then
-        notify(Config.Locale.need_lights)
-        return
-    end
-    siren = not siren
-    setOwnerSiren(veh, siren)
-    notify(siren and Config.Locale.siren_on or Config.Locale.siren_off)
     pushUi()
     broadcast()
 end
@@ -382,10 +341,6 @@ local function toggleScene()
         armVehicle(veh, cfg)
     end
     scene = not scene
-    if scene then
-        siren = false
-        setOwnerSiren(veh, false)
-    end
     applyPattern(veh, stage, mineMeta(), true, flashOn, scene, sweep)
     notify(scene and Config.Locale.scene_on or Config.Locale.scene_off)
     pushUi()
@@ -396,18 +351,16 @@ RegisterCommand('mallorca_els_1', function() setStage(1) end, false)
 RegisterCommand('mallorca_els_2', function() setStage(2) end, false)
 RegisterCommand('mallorca_els_3', function() setStage(3) end, false)
 RegisterCommand('mallorca_els_off', function() setStage(0) end, false)
-RegisterCommand('mallorca_els_siren', function() toggleSiren() end, false)
 RegisterCommand('mallorca_els_scene', function() toggleScene() end, false)
 
 RegisterCommand('els', function()
-    notify('Pechhulp ELS: 1 achter · 2 zwaai · 3 vol · 0 uit · R werklicht · G toon. Alleen fmltow / dlbrickade.')
+    notify('Pechhulp ELS: 1 achter · 2 zwaai · 3 vol · 0 uit · R werklicht. Geen sirene. Alleen fmltow / dlbrickade.')
 end, false)
 
 RegisterKeyMapping('mallorca_els_1', 'Pechhulp ELS achter', 'keyboard', Config.Keys.stage1)
 RegisterKeyMapping('mallorca_els_2', 'Pechhulp ELS zwaai', 'keyboard', Config.Keys.stage2)
 RegisterKeyMapping('mallorca_els_3', 'Pechhulp ELS vol', 'keyboard', Config.Keys.stage3)
 RegisterKeyMapping('mallorca_els_off', 'Pechhulp ELS uit', 'keyboard', Config.Keys.off)
-RegisterKeyMapping('mallorca_els_siren', 'Pechhulp ELS toon', 'keyboard', Config.Keys.siren)
 RegisterKeyMapping('mallorca_els_scene', 'Pechhulp ELS werklicht', 'keyboard', Config.Keys.scene)
 
 RegisterNetEvent('mallorca-els:apply', function(src, netId, data)
@@ -419,7 +372,7 @@ RegisterNetEvent('mallorca-els:apply', function(src, netId, data)
         return
     end
     local st = tonumber(data.stage) or 0
-    if st <= 0 and not data.siren and not data.scene then
+    if st <= 0 and not data.scene then
         local meta = remoteMeta[netId]
         local veh = NetworkGetEntityFromNetworkId(netId)
         if meta and veh ~= 0 and DoesEntityExist(veh) then
@@ -431,7 +384,6 @@ RegisterNetEvent('mallorca-els:apply', function(src, netId, data)
     end
     remote[netId] = {
         stage = st,
-        siren = data.siren == true,
         scene = data.scene == true
     }
 end)
@@ -525,7 +477,6 @@ AddEventHandler('onClientResourceStart', function(res)
     end
     hideUi()
     stage = 0
-    siren = false
     scene = false
     myVehicle = 0
     myNetId = 0

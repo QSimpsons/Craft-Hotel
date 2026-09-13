@@ -156,15 +156,14 @@ body.demo-mode::before {
   font-weight: 700;
 }
 
+.row.row-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
 .row button.on {
   color: #04110d;
   background: var(--amber);
   border-color: transparent;
-}
-
-.row button#siren.on {
-  background: var(--red);
-  color: #fff;
 }
 
 .row button#scene.on {

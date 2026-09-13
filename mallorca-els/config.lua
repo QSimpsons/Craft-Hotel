@@ -25,7 +25,6 @@ Config.Keys = {
     stage2 = '2',
     stage3 = '3',
     off = '0',
-    siren = 'G',
     scene = 'R'
 }
 
@@ -36,8 +35,6 @@ Config.FlashMs = {
 
 Config.UseHazardsFromStage = 2
 Config.HeadlightWigwag = true
-Config.SirenNeedsLights = true
-Config.HornOverride = true
 Config.ShowPanel = true
 
 -- Paneel verschijnt bij instappen, lampen blijven uit tot 1/2/3
@@ -45,9 +42,6 @@ Config.StartStageOnEnter = 0
 
 Config.Locale = {
     stage = 'Lichten',
-    siren_on = 'Toon aan',
-    siren_off = 'Toon uit',
     scene_on = 'Werklicht aan',
-    scene_off = 'Werklicht uit',
-    need_lights = 'Zet eerst de lichten aan (1, 2 of 3).'
+    scene_off = 'Werklicht uit'
 }

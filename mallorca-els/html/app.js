@@ -2,7 +2,6 @@
   const panel = document.getElementById('panel');
   const status = document.getElementById('status');
   const veh = document.getElementById('veh');
-  const sirenBtn = document.getElementById('siren');
   const sceneBtn = document.getElementById('scene');
   const bar = document.getElementById('bar');
   const gate = document.getElementById('gate');
@@ -32,7 +31,6 @@
       const value = Number(btn.getAttribute('data-stage'));
       btn.classList.toggle('on', value === stage);
     });
-    sirenBtn.classList.toggle('on', !!data.siren);
     sceneBtn.classList.toggle('on', !!data.scene);
     status.textContent = data.scene ? 'WERKLICHT' : (data.stageName || 'UIT');
     veh.textContent = data.vehicle || data.model || 'fmltow / dlbrickade';
@@ -57,11 +55,11 @@
     hidePanel();
 
     const demo = [
-      { visible: true, stage: 0, stageName: 'UIT', siren: false, scene: false, vehicle: 'FML Tow' },
-      { visible: true, stage: 1, stageName: 'ACHTER', siren: false, scene: false, vehicle: 'FML Tow' },
-      { visible: true, stage: 2, stageName: 'ZWAAI', siren: false, scene: false, vehicle: 'DL Brickade' },
-      { visible: true, stage: 3, stageName: 'VOL', siren: true, scene: false, vehicle: 'DL Brickade' },
-      { visible: true, stage: 0, stageName: 'UIT', siren: false, scene: true, vehicle: 'FML Tow' }
+      { visible: true, stage: 0, stageName: 'UIT', scene: false, vehicle: 'FML Tow' },
+      { visible: true, stage: 1, stageName: 'ACHTER', scene: false, vehicle: 'FML Tow' },
+      { visible: true, stage: 2, stageName: 'ZWAAI', scene: false, vehicle: 'DL Brickade' },
+      { visible: true, stage: 3, stageName: 'VOL', scene: false, vehicle: 'DL Brickade' },
+      { visible: true, stage: 0, stageName: 'UIT', scene: true, vehicle: 'FML Tow' }
     ];
     let i = 0;
 
@@ -76,7 +74,7 @@
       seated = true;
       enterBtn.hidden = true;
       exitBtn.hidden = false;
-      gateText.textContent = 'Je zit in de wagen. Schakelkast aan (1/2/3/0 · R · G).';
+      gateText.textContent = 'Je zit in de wagen. Schakelkast aan (1/2/3/0 · R). Geen sirene.';
       i = 0;
       render(demo[0]);
       stopCycle();
