@@ -3,20 +3,31 @@ Config = {}
 -- esx | standalone (standalone = iedereen mag takelen, zonder job)
 Config.Framework = 'esx'
 
--- ESX jobs die mogen takelen (jouw mechanic + takel)
-Config.JobName = 'takel'
+-- ESX Wegenwacht / mechanic rangen 1 t/m 6 (6 = Manager)
+Config.JobName = 'mechanic'
 Config.AllowedJobs = {
-    takel = true,
     mechanic = true,
+    wegenwacht = true,
+    takel = true,
     mecano = true,
     bennys = true,
     lscustoms = true,
     monteur = true,
     anwb = true
 }
+Config.MinGrade = 1
+Config.MaxGrade = 6
+Config.ManagerGrade = 6
+Config.JobGrades = {
+    [1] = 'Leerling autotechnicus',
+    [2] = '3e Autotechnicus',
+    [3] = '2e Autotechnicus',
+    [4] = '1e Autotechnicus',
+    [5] = 'Teamleider',
+    [6] = 'Manager'
+}
 Config.Society = 'society_mechanic'
 Config.RequireJob = true
--- Mechanic heeft meestal al dienst; geen extra F1-dienst verplicht
 Config.RequireDuty = false
 
 -- Toetsen (ook aanpasbaar in FiveM Key Bindings)
@@ -52,7 +63,27 @@ function Config.IsAllowedJob(name)
     if Config.JobName and name == string.lower(Config.JobName) then
         return true
     end
-    if name:find('mechanic', 1, true) or name:find('mecano', 1, true) or name:find('takel', 1, true) then
+    if name:find('mechanic', 1, true) or name:find('mecano', 1, true) or name:find('takel', 1, true) or name:find('wegenwacht', 1, true) then
+        return true
+    end
+    return false
+end
+
+function Config.IsAllowedGrade(grade)
+    grade = tonumber(grade)
+    if grade == nil then
+        return false
+    end
+    local minG = Config.MinGrade or 1
+    local maxG = Config.MaxGrade or 6
+    if grade >= minG and grade <= maxG then
+        return true
+    end
+    -- ESX telt soms 0–5 i.p.v. 1–6 (0 = leerling, 5 = manager)
+    if minG == 1 and grade == 0 then
+        return true
+    end
+    if maxG == 6 and grade == 5 then
         return true
     end
     return false
@@ -157,8 +188,8 @@ Config.Impound = {
 }
 
 Config.GarageVehicles = {
-    { model = 'fmltow', label = 'FML Tow', minGrade = 0 },
-    { model = 'dlbrickade', label = 'DL Brickade', minGrade = 0 },
+    { model = 'fmltow', label = 'FML Tow', minGrade = 1 },
+    { model = 'dlbrickade', label = 'DL Brickade', minGrade = 1 },
     { model = 'flatbed', label = 'Flatbed', minGrade = 0 },
     { model = 'towtruck', label = 'Takelwagen', minGrade = 0 }
 }
@@ -194,7 +225,7 @@ Config.Markers = {
 Config.Locale = {
     duty_on = 'Je bent nu in dienst bij Mallorca Takel.',
     duty_off = 'Je bent uit dienst.',
-    not_employee = 'Dit is voor mechanic / takel.',
+    not_employee = 'Dit is voor Wegenwacht mechanic rang 1 t/m 6.',
     need_duty = 'Ga eerst in dienst bij het depot.',
     no_truck = 'Je hebt geen takelwagen in de buurt.',
     no_target = 'Geen voertuig om te takelen.',

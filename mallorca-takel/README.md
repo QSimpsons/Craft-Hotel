@@ -15,7 +15,7 @@ ensure ox_target
 ensure mallorca-takel
 ```
 
-4. Job `mechanic` of `takel` is genoeg (geen extra job nodig).
+4. Job **mechanic / Wegenwacht rang 1 t/m 6** (6 = Manager).
 
 5. `ensure mallorca-takel` of herstart de server.
 

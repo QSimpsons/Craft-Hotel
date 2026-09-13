@@ -45,11 +45,18 @@ local function isEmployee()
     if Config.Framework ~= 'esx' or not Config.RequireJob then
         return true
     end
-    local name = PlayerData.job and PlayerData.job.name
-    if Config.IsAllowedJob then
-        return Config.IsAllowedJob(name)
+    local job = PlayerData.job
+    if not job then
+        return false
     end
-    return name == Config.JobName
+    local nameOk = Config.IsAllowedJob and Config.IsAllowedJob(job.name)
+    if not nameOk then
+        return false
+    end
+    if Config.IsAllowedGrade then
+        return Config.IsAllowedGrade(job.grade)
+    end
+    return true
 end
 
 local function jobGrade()
