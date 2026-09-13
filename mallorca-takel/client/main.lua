@@ -295,6 +295,53 @@ local function doAttach(specificTarget)
     end
 end
 
+local function doDetach()
+    local success, msg = Tow.Detach(true)
+    notify(msg)
+    refreshNui()
+    if success then
+        TriggerServerEvent('mallorca-takel:server:towing', nil)
+    end
+end
+
+local function doImpound()
+    local ok, reason = canWork()
+    if not ok then
+        notify(reason)
+        return
+    end
+
+    local attached = Tow.GetAttached()
+    if attached == 0 then
+        notify('need_attached')
+        return
+    end
+
+    local pos = GetEntityCoords(PlayerPedId())
+    if #(pos - Config.Impound.coords) > Config.ImpoundDistance then
+        notify('need_attached')
+        return
+    end
+
+    local info = Tow.Describe(attached)
+    local props = nil
+    if ESX and ESX.Game and ESX.Game.GetVehicleProperties then
+        props = ESX.Game.GetVehicleProperties(attached)
+    else
+        props = {
+            model = GetEntityModel(attached),
+            plate = info and info.plate or ''
+        }
+    end
+
+    TriggerServerEvent('mallorca-takel:server:impound', {
+        plate = info and info.plate or '',
+        model = info and info.model or '',
+        props = props,
+        reason = 'Getakeld'
+    })
+end
+
 local function takeParkedTruck(entity)
     local ok, reason = canWork()
     if not ok then
@@ -403,44 +450,6 @@ end
 
 function MallorcaTakelOnDuty()
     return onDuty
-end
-
-local function doImpound()
-    local ok, reason = canWork()
-    if not ok then
-        notify(reason)
-        return
-    end
-
-    local attached = Tow.GetAttached()
-    if attached == 0 then
-        notify('need_attached')
-        return
-    end
-
-    local pos = GetEntityCoords(PlayerPedId())
-    if #(pos - Config.Impound.coords) > Config.ImpoundDistance then
-        notify('need_attached')
-        return
-    end
-
-    local info = Tow.Describe(attached)
-    local props = nil
-    if ESX and ESX.Game and ESX.Game.GetVehicleProperties then
-        props = ESX.Game.GetVehicleProperties(attached)
-    else
-        props = {
-            model = GetEntityModel(attached),
-            plate = info and info.plate or ''
-        }
-    end
-
-    TriggerServerEvent('mallorca-takel:server:impound', {
-        plate = info and info.plate or '',
-        model = info and info.model or '',
-        props = props,
-        reason = 'Getakeld'
-    })
 end
 
 RegisterNetEvent('mallorca-takel:client:impoundOk', function()
