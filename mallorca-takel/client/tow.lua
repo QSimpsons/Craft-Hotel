@@ -4,6 +4,10 @@ local attachedVehicle = 0
 local attachedTow = 0
 local attachedType = nil
 local extraHashes
+local hookModels = {
+    [`towtruck`] = true,
+    [`towtruck2`] = true,
+}
 
 local function extraModelSet()
     if extraHashes then
@@ -14,6 +18,14 @@ local function extraModelSet()
         extraHashes[joaat(Config.ExtraTowModels[i])] = true
     end
     return extraHashes
+end
+
+local function isHookModel(model)
+    if hookModels[model] then
+        return true
+    end
+    local cfg = Config.TowVehicles and Config.TowVehicles[model]
+    return cfg and cfg.type == 'hook'
 end
 
 local function defaultFlatbed()
@@ -41,13 +53,17 @@ function Tow.GetProfile(vehicle)
     end
 
     if extraModelSet()[model] then
-        if IsThisModelATowTruck(model) then
+        if isHookModel(model) then
+            return defaultHook()
+        end
+        local extraName = string.lower(GetDisplayNameFromVehicleModel(model) or '')
+        if extraName:find('tow', 1, true) or extraName:find('wreck', 1, true) then
             return defaultHook()
         end
         return defaultFlatbed()
     end
 
-    if IsThisModelATowTruck(model) then
+    if isHookModel(model) then
         return defaultHook()
     end
 
@@ -198,8 +214,10 @@ end
 local function prepareEntity(entity)
     SetEntityAsMissionEntity(entity, true, true)
     SetVehicleHasBeenOwnedByPlayer(entity, true)
-    if not NetworkGetEntityIsNetworked(entity) then
-        NetworkRegisterEntityAsNetworked(entity)
+    if NetworkGetEntityIsNetworked and not NetworkGetEntityIsNetworked(entity) then
+        if NetworkRegisterEntityAsNetworked then
+            NetworkRegisterEntityAsNetworked(entity)
+        end
     end
 end
 
