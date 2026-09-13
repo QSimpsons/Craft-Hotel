@@ -10,7 +10,7 @@ Mallorca Takel — installatie
    ensure ox_target
    ensure mallorca-takel
 
-4. Zet een speler op job takel (grade 0–3).
+4. Job mechanic of takel is genoeg.
 5. restart mallorca-takel
 
 In-game

@@ -35,7 +35,7 @@ local function registerOxTarget()
             distance = Config.TargetDistance or 2.5,
             canInteract = function(entity)
                 if not employeeOnDuty() then return false end
-                if not entity or Tow.IsTowVehicle(entity) then return false end
+                if not entity or Tow.IsUsableTow(entity) then return false end
                 local attached = Tow.GetAttached()
                 return attached == 0
             end,
@@ -52,7 +52,7 @@ local function registerOxTarget()
                 if not employeeOnDuty() then return false end
                 local attached = Tow.GetAttached()
                 if attached == 0 then return false end
-                return entity == attached or Tow.IsTowVehicle(entity)
+                return entity == attached or Tow.IsUsableTow(entity)
             end,
             onSelect = function()
                 TriggerEvent('mallorca-takel:internal:eyeDetach')
@@ -67,7 +67,7 @@ local function registerOxTarget()
                 if not employeeOnDuty() then return false end
                 local attached = Tow.GetAttached()
                 if attached == 0 then return false end
-                if entity ~= attached and not Tow.IsTowVehicle(entity) then return false end
+                if entity ~= attached and not Tow.IsUsableTow(entity) then return false end
                 return #(GetEntityCoords(PlayerPedId()) - Config.Impound.coords) <= (Config.ImpoundDistance + 4.0)
             end,
             onSelect = function()
@@ -93,7 +93,7 @@ local function registerOxTarget()
             label = Config.Locale.eye_call,
             distance = Config.TargetDistance or 2.5,
             canInteract = function(entity)
-                if Tow.IsTowVehicle(entity) then return false end
+                if Tow.IsUsableTow(entity) then return false end
                 return true
             end,
             onSelect = function(data)
@@ -134,7 +134,7 @@ local function qbOptions()
             label = Config.Locale.eye_tow,
             canInteract = function(entity)
                 if not employeeOnDuty() then return false end
-                if not entity or Tow.IsTowVehicle(entity) then return false end
+                if not entity or Tow.IsUsableTow(entity) then return false end
                 return Tow.GetAttached() == 0
             end,
             action = function(entity)
@@ -148,7 +148,7 @@ local function qbOptions()
                 if not employeeOnDuty() then return false end
                 local attached = Tow.GetAttached()
                 if attached == 0 then return false end
-                return entity == attached or Tow.IsTowVehicle(entity)
+                return entity == attached or Tow.IsUsableTow(entity)
             end,
             action = function()
                 TriggerEvent('mallorca-takel:internal:eyeDetach')
@@ -168,7 +168,7 @@ local function qbOptions()
             icon = 'fas fa-phone',
             label = Config.Locale.eye_call,
             canInteract = function(entity)
-                return entity and not Tow.IsTowVehicle(entity)
+                return entity and not Tow.IsUsableTow(entity)
             end,
             action = function(entity)
                 TriggerEvent('mallorca-takel:internal:eyeCall', entity)

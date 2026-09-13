@@ -3,14 +3,82 @@ Tow = Tow or {}
 local attachedVehicle = 0
 local attachedTow = 0
 local attachedType = nil
+local extraHashes
 
-local function modelConfig(vehicle)
-    if vehicle == 0 then return nil end
-    return Config.TowVehicles[GetEntityModel(vehicle)]
+local function extraModelSet()
+    if extraHashes then
+        return extraHashes
+    end
+    extraHashes = {}
+    for i = 1, #(Config.ExtraTowModels or {}) do
+        extraHashes[joaat(Config.ExtraTowModels[i])] = true
+    end
+    return extraHashes
+end
+
+local function defaultFlatbed()
+    return {
+        type = 'flatbed',
+        label = 'Takelwagen',
+        bone = 'bodyshell',
+        offset = vector3(0.0, -2.0, 1.0),
+        rotation = vector3(0.0, 0.0, 0.0)
+    }
+end
+
+local function defaultHook()
+    return { type = 'hook', label = 'Takelwagen' }
+end
+
+function Tow.GetProfile(vehicle)
+    if vehicle == 0 or not DoesEntityExist(vehicle) then
+        return nil
+    end
+
+    local model = GetEntityModel(vehicle)
+    if Config.TowVehicles[model] then
+        return Config.TowVehicles[model]
+    end
+
+    if extraModelSet()[model] then
+        if IsThisModelATowTruck(model) then
+            return defaultHook()
+        end
+        return defaultFlatbed()
+    end
+
+    if IsThisModelATowTruck(model) then
+        return defaultHook()
+    end
+
+    local name = string.lower(GetDisplayNameFromVehicleModel(model) or '')
+    if name:find('tow', 1, true) or name:find('wreck', 1, true) then
+        return defaultHook()
+    end
+    if name:find('flat', 1, true) or name:find('slam', 1, true) or name:find('takel', 1, true) or name:find('bed', 1, true) then
+        return defaultFlatbed()
+    end
+
+    return nil
 end
 
 function Tow.IsTowVehicle(vehicle)
-    return modelConfig(vehicle) ~= nil
+    return Tow.GetProfile(vehicle) ~= nil
+end
+
+function Tow.IsUsableTow(vehicle)
+    if Tow.IsTowVehicle(vehicle) then
+        return true
+    end
+    if not Config.AllowCurrentVehicle then
+        return false
+    end
+    local class = GetVehicleClass(vehicle)
+    return class == 10 or class == 11 or class == 17 or class == 20
+end
+
+function Tow.ResolveProfile(vehicle)
+    return Tow.GetProfile(vehicle) or (Tow.IsUsableTow(vehicle) and defaultFlatbed()) or nil
 end
 
 function Tow.GetAttached()
@@ -85,17 +153,17 @@ end
 
 function Tow.FindTruck(ped, maxDist)
     local veh = GetVehiclePedIsIn(ped, false)
-    if veh ~= 0 and Tow.IsTowVehicle(veh) then
+    if veh ~= 0 and Tow.IsUsableTow(veh) then
         return veh
     end
 
-    maxDist = maxDist or 6.0
+    maxDist = maxDist or 8.0
     local coords = GetEntityCoords(ped)
     local vehicles = GetGamePool('CVehicle')
     local closest, dist = 0, maxDist
     for i = 1, #vehicles do
         local v = vehicles[i]
-        if Tow.IsTowVehicle(v) then
+        if Tow.IsUsableTow(v) then
             local d = #(GetEntityCoords(v) - coords)
             if d < dist then
                 closest = v
@@ -107,7 +175,7 @@ function Tow.FindTruck(ped, maxDist)
 end
 
 function Tow.FindTarget(tow)
-    local cfg = modelConfig(tow)
+    local cfg = Tow.ResolveProfile(tow)
     if not cfg then return 0 end
 
     local point
@@ -117,8 +185,11 @@ function Tow.FindTarget(tow)
         point = GetOffsetFromEntityInWorldCoords(tow, 0.0, -7.5, 0.0)
     end
 
-    local target = closestFromPoint(point, Config.TowSearchDistance, tow)
-    if target == 0 or Tow.IsTowVehicle(target) then
+    local target = closestFromPoint(point, Config.TowSearchDistance or 12.0, tow)
+    if target == 0 then
+        target = closestFromPoint(GetEntityCoords(tow), Config.TowSearchDistance or 12.0, tow)
+    end
+    if target == 0 or Tow.IsUsableTow(target) then
         return 0
     end
     return target
@@ -135,47 +206,60 @@ end
 local function attachHook(tow, target)
     prepareEntity(target)
     prepareEntity(tow)
-    local front = GetOffsetFromEntityInWorldCoords(tow, 0.0, 7.2, 0.15)
-    SetEntityCoords(target, front.x, front.y, front.z, false, false, false, false)
-    SetEntityHeading(target, GetEntityHeading(tow))
-    Wait(120)
-    SetVehicleOnGroundProperly(target)
     SetVehicleTowTruckArmPosition(tow, 1.0)
-    Wait(350)
-    AttachVehicleToTowTruck(tow, target, false, 0.0, 0.0, 0.0)
     Wait(200)
-    if IsVehicleAttachedToTowTruck(tow, target) then
-        return true
-    end
     AttachVehicleToTowTruck(tow, target, true, 0.0, 0.0, 0.0)
     Wait(150)
-    if IsVehicleAttachedToTowTruck(tow, target) then
+    if IsVehicleAttachedToTowTruck(tow, target) or IsEntityAttachedToEntity(target, tow) then
+        return true
+    end
+    AttachVehicleToTowTruck(tow, target, false, 0.0, 0.0, 0.0)
+    Wait(150)
+    if IsVehicleAttachedToTowTruck(tow, target) or IsEntityAttachedToEntity(target, tow) then
         return true
     end
     local bone = GetEntityBoneIndexByName(tow, 'bodyshell')
+    if bone == -1 then
+        bone = GetEntityBoneIndexByName(tow, 'chassis')
+    end
     if bone == -1 then bone = 0 end
-    AttachEntityToEntity(target, tow, bone, 0.0, 4.0, 0.25, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
-    return IsEntityAttachedToEntity(target, tow)
+    AttachEntityToEntity(target, tow, bone, 0.0, 2.8, 0.35, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
+    return IsEntityAttachedToEntity(target, tow) or IsVehicleAttachedToTowTruck(tow, target)
 end
 
 local function attachFlatbed(tow, target, cfg)
     prepareEntity(target)
     prepareEntity(tow)
-    local rear = GetOffsetFromEntityInWorldCoords(tow, 0.0, -6.5, 0.4)
-    SetEntityCoords(target, rear.x, rear.y, rear.z, false, false, false, false)
-    SetEntityHeading(target, GetEntityHeading(tow))
-    Wait(120)
-    local bone = GetEntityBoneIndexByName(tow, cfg.bone or 'bodyshell')
-    if bone == -1 then bone = 0 end
-    local off = cfg.offset or vector3(0.0, -2.0, 1.0)
+
+    local bones = { cfg.bone or 'bodyshell', 'bodyshell', 'chassis', 'chassis_dummy', 'boot' }
+    local offsets = {
+        cfg.offset or vector3(0.0, -2.0, 1.0),
+        vector3(0.0, -2.2, 1.05),
+        vector3(0.0, -1.7, 0.9),
+        vector3(0.0, -2.5, 1.15),
+        vector3(0.0, -1.4, 0.65)
+    }
     local rot = cfg.rotation or vector3(0.0, 0.0, 0.0)
-    AttachEntityToEntity(
-        target, tow, bone,
-        off.x, off.y, off.z,
-        rot.x, rot.y, rot.z,
-        false, false, false, false, 2, true
-    )
-    Wait(80)
+
+    for b = 1, #bones do
+        local bone = GetEntityBoneIndexByName(tow, bones[b])
+        if bone ~= -1 or b == #bones then
+            if bone == -1 then bone = 0 end
+            for o = 1, #offsets do
+                local off = offsets[o]
+                AttachEntityToEntity(
+                    target, tow, bone,
+                    off.x, off.y, off.z,
+                    rot.x, rot.y, rot.z,
+                    false, false, true, false, 20, true
+                )
+                Wait(50)
+                if IsEntityAttachedToEntity(target, tow) then
+                    return true
+                end
+            end
+        end
+    end
     return IsEntityAttachedToEntity(target, tow)
 end
 
@@ -186,13 +270,17 @@ function Tow.Attach(specificTarget)
         return false, 'already_towing'
     end
 
-    local searchDist = specificTarget and 14.0 or 8.0
+    local searchDist = specificTarget and 18.0 or 10.0
     local tow = Tow.FindTruck(ped, searchDist)
     if tow == 0 then
         return false, 'no_truck'
     end
 
-    local cfg = modelConfig(tow)
+    local cfg = Tow.ResolveProfile(tow)
+    if not cfg then
+        return false, 'no_truck'
+    end
+
     local target = specificTarget
     if not target or target == 0 or not DoesEntityExist(target) then
         target = Tow.FindTarget(tow)
@@ -200,11 +288,11 @@ function Tow.Attach(specificTarget)
     if target == 0 or target == tow then
         return false, 'no_target'
     end
-    if Tow.IsTowVehicle(target) then
+    if Tow.IsUsableTow(target) then
         return false, 'class_blocked'
     end
 
-    if #(GetEntityCoords(tow) - GetEntityCoords(target)) > 16.0 then
+    if #(GetEntityCoords(tow) - GetEntityCoords(target)) > 18.0 then
         return false, 'too_far_truck'
     end
 
@@ -216,9 +304,8 @@ function Tow.Attach(specificTarget)
         return false, 'occupied'
     end
 
-    if not Tow.EnsureControl(tow) or not Tow.EnsureControl(target) then
-        return false, 'no_target'
-    end
+    Tow.EnsureControl(tow)
+    Tow.EnsureControl(target)
 
     SetVehicleEngineOn(target, false, true, true)
     local ok

@@ -3,11 +3,21 @@ Config = {}
 -- esx | standalone (standalone = iedereen mag takelen, zonder job)
 Config.Framework = 'esx'
 
--- ESX job
+-- ESX jobs die mogen takelen (jouw mechanic + takel)
 Config.JobName = 'takel'
-Config.Society = 'society_takel'
+Config.AllowedJobs = {
+    takel = true,
+    mechanic = true,
+    mecano = true,
+    bennys = true,
+    lscustoms = true,
+    monteur = true,
+    anwb = true
+}
+Config.Society = 'society_mechanic'
 Config.RequireJob = true
-Config.RequireDuty = true
+-- Mechanic heeft meestal al dienst; geen extra F1-dienst verplicht
+Config.RequireDuty = false
 
 -- Toetsen (ook aanpasbaar in FiveM Key Bindings)
 Config.Keys = {
@@ -15,19 +25,45 @@ Config.Keys = {
     toggle = 'O' -- takelen / loskoppelen
 }
 
--- Oogje: ox_target / qb-target / qtarget (voertuig aankijken om te takelen)
+-- Oogje: ox_target / qb-target / qtarget (ook vanuit de takelwagen)
 Config.UseTarget = true
-Config.TargetDistance = 2.5
+Config.TargetDistance = 12.0
 
--- Zet echte takelwagens neer bij het depot
-Config.PlaceVehicles = true
+-- Zet extra wagens neer bij ons depot (false = alleen jouw eigen takelwagens)
+Config.PlaceVehicles = false
+
+-- Zit je in een utility/commercial wagen als mechanic? Dan is dat je takelwagen.
+Config.AllowCurrentVehicle = true
+
+-- Extra spawncodes van jouw eigen takelwagens (addons)
+Config.ExtraTowModels = {
+    -- 'jouwflatbed',
+    -- 'jouwtowtruck',
+}
+
+function Config.IsAllowedJob(name)
+    if not name or name == '' then
+        return false
+    end
+    name = string.lower(tostring(name))
+    if Config.AllowedJobs and Config.AllowedJobs[name] then
+        return true
+    end
+    if Config.JobName and name == string.lower(Config.JobName) then
+        return true
+    end
+    if name:find('mechanic', 1, true) or name:find('mecano', 1, true) or name:find('takel', 1, true) then
+        return true
+    end
+    return false
+end
 
 Config.Command = 'takel'
 Config.CallCommand = 'takelhulp'
 
 -- Afstanden
 Config.InteractDistance = 2.6
-Config.TowSearchDistance = 9.0
+Config.TowSearchDistance = 12.0
 Config.ImpoundDistance = 8.0
 Config.BillDistance = 4.0
 
@@ -133,7 +169,7 @@ Config.Markers = {
 Config.Locale = {
     duty_on = 'Je bent nu in dienst bij Mallorca Takel.',
     duty_off = 'Je bent uit dienst.',
-    not_employee = 'Je werkt niet bij Mallorca Takel.',
+    not_employee = 'Dit is voor mechanic / takel.',
     need_duty = 'Ga eerst in dienst bij het depot.',
     no_truck = 'Je hebt geen takelwagen in de buurt.',
     no_target = 'Geen voertuig om te takelen.',

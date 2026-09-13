@@ -49,10 +49,13 @@ local function isEmployee(src)
     if not xPlayer or not xPlayer.job then
         return false, 0
     end
-    if xPlayer.job.name ~= Config.JobName then
-        return false, 0
+    if xPlayer.job and Config.IsAllowedJob and Config.IsAllowedJob(xPlayer.job.name) then
+        return true, xPlayer.job.grade or 0
     end
-    return true, xPlayer.job.grade or 0
+    if xPlayer.job and xPlayer.job.name == Config.JobName then
+        return true, xPlayer.job.grade or 0
+    end
+    return false, 0
 end
 
 local function isOnDuty(src)

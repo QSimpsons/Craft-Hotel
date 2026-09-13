@@ -15,11 +15,7 @@ ensure ox_target
 ensure mallorca-takel
 ```
 
-4. Geef jezelf de job in-game of via DB:
-
-```sql
-UPDATE users SET job = 'takel', job_grade = 3 WHERE identifier = 'jouw-identifier';
-```
+4. Job `mechanic` of `takel` is genoeg (geen extra job nodig).
 
 5. `ensure mallorca-takel` of herstart de server.
 
@@ -39,8 +35,8 @@ Toetsen aanpassen: FiveM → Settings → Key Bindings → FiveM.
 
 ## Wat zit erin
 
-- Haak (`towtruck` / `towtruck2`) en flatbed (`flatbed` / `slamtruck`) staan bij het depot
-- Oogje (ox_target / qb-target / qtarget): voertuig aankijken en takelen
+- Werkt met job **mechanic / mecano / takel** en jouw eigen takelwagens
+- Oogje (ox_target): vanuit de wagen een auto aankijken → takelen
 - Dienst aan/uit
 - SQL-inbeslagname (`mallorca_impound`)
 - Spelersoproepen + optionele NPC-pechhulp
