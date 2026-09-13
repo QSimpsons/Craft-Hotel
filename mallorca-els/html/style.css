@@ -25,6 +25,17 @@ body.demo-mode {
   background: linear-gradient(180deg, #1a120c, #0a0705);
 }
 
+body.demo-mode::before {
+  content: "Mallorca ELS — alleen fmltow & dlbrickade";
+  position: absolute;
+  top: 3vh;
+  left: 3vh;
+  font-size: 2vh;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.04em;
+}
+
 .panel {
   position: absolute;
   left: 2.4vh;
