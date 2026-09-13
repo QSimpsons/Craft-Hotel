@@ -2,12 +2,12 @@ local myVehicle = 0
 local myNetId = 0
 local stage = 0
 local siren = false
+local scene = false
 local extras = {}
-local groupA = {}
-local groupB = {}
 local savedExtras = {}
 local flashOn = false
 local remoteFlash = false
+local sweep = 1
 local profile = nil
 local remote = {}
 local remoteMeta = {}
@@ -145,6 +145,18 @@ local function allExtras(veh, list, on)
     end
 end
 
+local function rearExtras(list)
+    local out = {}
+    local startAt = math.max(1, math.ceil(#list / 2))
+    for i = startAt, #list do
+        out[#out + 1] = list[i]
+    end
+    if #out == 0 then
+        return list
+    end
+    return out
+end
+
 local function setOwnerSiren(veh, on)
     SetVehicleSiren(veh, on and true or false)
     if type(SetVehicleHasMutedSirens) == 'function' then
@@ -166,6 +178,7 @@ local function pushUi()
             stage = stage,
             stageName = Config.StageNames[stage] or 'UIT',
             siren = siren,
+            scene = scene,
             vehicle = profile and profile.label or '',
             model = modelName(myVehicle) or 'fmltow / dlbrickade'
         }
@@ -179,26 +192,33 @@ local function broadcast()
     TriggerServerEvent('mallorca-els:update', myNetId, {
         stage = stage,
         siren = siren,
+        scene = scene,
         model = modelName(myVehicle) or ''
     })
 end
 
-local function applyPattern(veh, st, meta, isOwner, flash)
+local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
     if not DoesEntityExist(veh) then
         return
     end
     disableAutoRepair(veh)
 
-    local useHazards = Config.UseHazardsFromStage and st >= Config.UseHazardsFromStage
-    setHazards(veh, useHazards)
-
     local list = (meta and meta.extras) or extras
-    local a = (meta and meta.groupA) or groupA
-    local b = (meta and meta.groupB) or groupB
     local saved = meta and meta.saved or savedExtras
+
+    if sceneOn then
+        allExtras(veh, list, true)
+        setHazards(veh, true)
+        SetVehicleLights(veh, 2)
+        if isOwner then
+            setOwnerSiren(veh, false)
+        end
+        return
+    end
 
     if st <= 0 then
         restoreExtras(veh, saved)
+        setHazards(veh, false)
         SetVehicleLights(veh, 0)
         if isOwner then
             setOwnerSiren(veh, false)
@@ -206,12 +226,13 @@ local function applyPattern(veh, st, meta, isOwner, flash)
         return
     end
 
+    local useHazards = Config.UseHazardsFromStage and st >= Config.UseHazardsFromStage
+    setHazards(veh, useHazards)
+
     if st == 1 then
-        if #list > 0 then
-            allExtras(veh, list, true)
-        else
-            setHazards(veh, true)
-        end
+        local rear = rearExtras(list)
+        allExtras(veh, list, false)
+        allExtras(veh, rear, true)
         SetVehicleLights(veh, 0)
         if isOwner then
             setOwnerSiren(veh, false)
@@ -220,15 +241,13 @@ local function applyPattern(veh, st, meta, isOwner, flash)
     end
 
     if st == 2 then
-        if #a > 0 or #b > 0 then
-            for i = 1, #a do
-                setExtra(veh, a[i], flash)
+        if #list > 0 then
+            local idx = sweepAt or 1
+            if idx < 1 then idx = 1 end
+            if idx > #list then idx = 1 end
+            for i = 1, #list do
+                setExtra(veh, list[i], i == idx or i == idx - 1)
             end
-            for i = 1, #b do
-                setExtra(veh, b[i], not flash)
-            end
-        elseif #list > 0 then
-            allExtras(veh, list, flash)
         else
             setHazards(veh, flash)
         end
@@ -253,8 +272,6 @@ end
 local function mineMeta()
     return {
         extras = extras,
-        groupA = groupA,
-        groupB = groupB,
         saved = savedExtras
     }
 end
@@ -262,12 +279,14 @@ end
 local function resetMine(veh)
     stage = 0
     siren = false
+    scene = false
     if veh ~= 0 and DoesEntityExist(veh) then
-        applyPattern(veh, 0, mineMeta(), true, false)
+        applyPattern(veh, 0, mineMeta(), true, false, false, 1)
         if myNetId ~= 0 then
             TriggerServerEvent('mallorca-els:update', myNetId, {
                 stage = 0,
                 siren = false,
+                scene = false,
                 model = modelName(veh) or ''
             })
         end
@@ -275,8 +294,6 @@ local function resetMine(veh)
     myVehicle = 0
     myNetId = 0
     extras = {}
-    groupA = {}
-    groupB = {}
     savedExtras = {}
     profile = nil
     hideUi()
@@ -295,22 +312,22 @@ local function armVehicle(veh, cfg)
     end
     profile = cfg
     extras, savedExtras = snapshotExtras(veh, cfg)
-    groupA = filterExisting(veh, cfg.groupA)
-    groupB = filterExisting(veh, cfg.groupB)
     local start = math.floor(tonumber(Config.StartStageOnEnter) or 0)
     if start < 0 then start = 0 end
     if start > 3 then start = 3 end
     stage = start
     siren = false
+    scene = false
+    sweep = 1
     disableAutoRepair(veh)
     if stage > 0 then
-        applyPattern(veh, stage, mineMeta(), true, flashOn)
+        applyPattern(veh, stage, mineMeta(), true, flashOn, scene, sweep)
         broadcast()
     end
     pushUi()
 end
 
-local function cycleStage()
+local function setStage(nextStage)
     local veh = driverVehicle()
     local ok, cfg = isPechhulp(veh)
     if not ok then
@@ -319,16 +336,15 @@ local function cycleStage()
     if myVehicle ~= veh then
         armVehicle(veh, cfg)
     end
-    stage = stage + 1
-    if stage > 3 then
-        stage = 0
-        siren = false
-    end
+    stage = nextStage
     if stage < 2 then
         siren = false
     end
-    applyPattern(veh, stage, mineMeta(), true, flashOn)
-    notify(('Zwaailichten: %s'):format(Config.StageNames[stage] or 'UIT'))
+    if stage <= 0 then
+        scene = false
+    end
+    applyPattern(veh, stage, mineMeta(), true, flashOn, scene, sweep)
+    notify(('%s: %s'):format(Config.Locale.stage, Config.StageNames[stage] or 'UIT'))
     pushUi()
     broadcast()
 end
@@ -342,6 +358,9 @@ local function toggleSiren()
     if myVehicle ~= veh then
         armVehicle(veh, cfg)
     end
+    if scene then
+        return
+    end
     if Config.SirenNeedsLights and stage < 2 then
         notify(Config.Locale.need_lights)
         return
@@ -353,20 +372,43 @@ local function toggleSiren()
     broadcast()
 end
 
-RegisterCommand('mallorca_els_stage', function()
-    cycleStage()
-end, false)
+local function toggleScene()
+    local veh = driverVehicle()
+    local ok, cfg = isPechhulp(veh)
+    if not ok then
+        return
+    end
+    if myVehicle ~= veh then
+        armVehicle(veh, cfg)
+    end
+    scene = not scene
+    if scene then
+        siren = false
+        setOwnerSiren(veh, false)
+    end
+    applyPattern(veh, stage, mineMeta(), true, flashOn, scene, sweep)
+    notify(scene and Config.Locale.scene_on or Config.Locale.scene_off)
+    pushUi()
+    broadcast()
+end
 
-RegisterCommand('mallorca_els_siren', function()
-    toggleSiren()
-end, false)
+RegisterCommand('mallorca_els_1', function() setStage(1) end, false)
+RegisterCommand('mallorca_els_2', function() setStage(2) end, false)
+RegisterCommand('mallorca_els_3', function() setStage(3) end, false)
+RegisterCommand('mallorca_els_off', function() setStage(0) end, false)
+RegisterCommand('mallorca_els_siren', function() toggleSiren() end, false)
+RegisterCommand('mallorca_els_scene', function() toggleScene() end, false)
 
 RegisterCommand('els', function()
-    notify('Pechhulp ELS: Q = zwaailichten, G = sirene. Alleen fmltow / dlbrickade.')
+    notify('Pechhulp ELS: 1 achter · 2 zwaai · 3 vol · 0 uit · R werklicht · G toon. Alleen fmltow / dlbrickade.')
 end, false)
 
-RegisterKeyMapping('mallorca_els_stage', 'Pechhulp ELS zwaailichten', 'keyboard', Config.Keys.stage)
-RegisterKeyMapping('mallorca_els_siren', 'Pechhulp ELS sirene', 'keyboard', Config.Keys.siren)
+RegisterKeyMapping('mallorca_els_1', 'Pechhulp ELS achter', 'keyboard', Config.Keys.stage1)
+RegisterKeyMapping('mallorca_els_2', 'Pechhulp ELS zwaai', 'keyboard', Config.Keys.stage2)
+RegisterKeyMapping('mallorca_els_3', 'Pechhulp ELS vol', 'keyboard', Config.Keys.stage3)
+RegisterKeyMapping('mallorca_els_off', 'Pechhulp ELS uit', 'keyboard', Config.Keys.off)
+RegisterKeyMapping('mallorca_els_siren', 'Pechhulp ELS toon', 'keyboard', Config.Keys.siren)
+RegisterKeyMapping('mallorca_els_scene', 'Pechhulp ELS werklicht', 'keyboard', Config.Keys.scene)
 
 RegisterNetEvent('mallorca-els:apply', function(src, netId, data)
     if src == GetPlayerServerId(PlayerId()) then
@@ -376,19 +418,21 @@ RegisterNetEvent('mallorca-els:apply', function(src, netId, data)
     if not netId or type(data) ~= 'table' then
         return
     end
-    if (tonumber(data.stage) or 0) <= 0 and not data.siren then
+    local st = tonumber(data.stage) or 0
+    if st <= 0 and not data.siren and not data.scene then
         local meta = remoteMeta[netId]
         local veh = NetworkGetEntityFromNetworkId(netId)
         if meta and veh ~= 0 and DoesEntityExist(veh) then
-            applyPattern(veh, 0, meta, false, false)
+            applyPattern(veh, 0, meta, false, false, false, 1)
         end
         remote[netId] = nil
         remoteMeta[netId] = nil
         return
     end
     remote[netId] = {
-        stage = tonumber(data.stage) or 0,
-        siren = data.siren == true
+        stage = st,
+        siren = data.siren == true,
+        scene = data.scene == true
     }
 end)
 
@@ -409,14 +453,24 @@ CreateThread(function()
                 end
                 armVehicle(veh, cfg)
             end
-            if stage <= 0 then
+            if scene then
+                applyPattern(veh, stage, mineMeta(), true, flashOn, true, sweep)
                 Wait(250)
-            elseif stage >= 2 then
+            elseif stage <= 0 then
+                Wait(250)
+            elseif stage == 2 then
+                sweep = sweep + 1
+                if sweep > math.max(1, #extras) then
+                    sweep = 1
+                end
+                applyPattern(veh, stage, mineMeta(), true, flashOn, false, sweep)
+                Wait(Config.FlashMs[2] or 140)
+            elseif stage >= 3 then
                 flashOn = not flashOn
-                applyPattern(veh, stage, mineMeta(), true, flashOn)
-                Wait(Config.FlashMs[stage] or 160)
+                applyPattern(veh, stage, mineMeta(), true, flashOn, false, sweep)
+                Wait(Config.FlashMs[3] or 90)
             else
-                applyPattern(veh, stage, mineMeta(), true, flashOn)
+                applyPattern(veh, stage, mineMeta(), true, flashOn, false, sweep)
                 Wait(200)
             end
             pushUi()
@@ -441,21 +495,25 @@ CreateThread(function()
                         local list, saved = snapshotExtras(veh, cfg)
                         remoteMeta[netId] = {
                             extras = list,
-                            groupA = filterExisting(veh, cfg.groupA),
-                            groupB = filterExisting(veh, cfg.groupB),
                             saved = saved
                         }
                     end
-                    if data.stage >= 2 then
+                    local st = data.stage or 0
+                    if data.scene then
+                        applyPattern(veh, st, remoteMeta[netId], false, remoteFlash, true, 1)
+                    elseif st >= 2 then
                         anyFlash = true
+                        local idx = (math.floor(GetGameTimer() / (Config.FlashMs[2] or 140)) % math.max(1, #remoteMeta[netId].extras)) + 1
+                        applyPattern(veh, st, remoteMeta[netId], false, remoteFlash, false, idx)
+                    else
+                        applyPattern(veh, st, remoteMeta[netId], false, remoteFlash, false, 1)
                     end
-                    applyPattern(veh, data.stage, remoteMeta[netId], false, remoteFlash)
                 end
             end
         end
 
         if anyFlash then
-            waitMs = Config.FlashMs[3] or 110
+            waitMs = Config.FlashMs[3] or 90
         end
         Wait(waitMs)
     end
@@ -468,6 +526,7 @@ AddEventHandler('onClientResourceStart', function(res)
     hideUi()
     stage = 0
     siren = false
+    scene = false
     myVehicle = 0
     myNetId = 0
 end)

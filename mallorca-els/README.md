@@ -1,11 +1,8 @@
-# Mallorca ELS — pechhulp
+# Mallorca ELS — pechhulp schakelkast
 
-Volledig ELS **alleen** voor **fmltow** en **dlbrickade**. Andere voertuigen doen niets.
+Ander ELS dan de oude Q-cyclus. Dit is een **schakelkast** alleen voor **fmltow** en **dlbrickade**.
 
 ## Installatie
-
-1. Unzip `mallorca-els` in `resources` (los van je voertuig-pack).
-2. Zet in `server.cfg` **na** de voertuig-resources:
 
 ```cfg
 ensure fmltow
@@ -13,36 +10,24 @@ ensure dlbrickade
 ensure mallorca-els
 ```
 
-3. `ensure mallorca-els` of herstart de server.
+ELS is alleen beschikbaar als je **bestuurder** bent van die twee wagens. Te voet: niets. Uitstappen: alles uit.
 
-Geen SQL, geen job-check. ELS **gaat alleen aan als je instapt** als bestuurder van `fmltow` of `dlbrickade` (cruise-lichten + paneel). Te voet of in een andere auto gebeurt er niets. Stap je uit, dan gaat alles uit.
+Bij instappen verschijnt de kast rechtsboven; lampen blijven uit tot je een stand kiest.
 
 ## Bediening
 
 | Toets | Actie |
 |--------|--------|
-| **Q** | Zwaailichten: uit → cruise → waarschuwing → vol |
-| **G** | Sirene (pas vanaf waarschuwing / vol) |
-| Claxon | Korte sirene zolang je indrukt (als G uit staat) |
-| `/els` | Korte uitleg in chat |
+| **1** | Achterlichten (park/waarschuwing achter) |
+| **2** | Zwaailichten (lopende sweep) |
+| **3** | Vol (snel knipperen + koplampen) |
+| **0** | Alles uit |
+| **R** | Werklicht (alles vast aan, voor pech langs de weg) |
+| **G** | Toon / sirene (vanaf stand 2) |
+| Claxon | Korte toon zolang je indrukt |
 
-Toetsen aanpassen: FiveM → Settings → Key Bindings → FiveM → Pechhulp ELS.
-
-## Stages
-
-1. **Cruise** — lampen (extras) vast aan  
-2. **Waarschuwing** — A/B knipperen + noodknippers  
-3. **Vol** — snel knipperen + koplampen + sirene mogelijk  
-
-Heeft de wagen geen extras, dan vallen noodknippers en koplampen in. Extra’s 1–14 worden automatisch herkend.
-
-## Bestanden
-
-- `config.lua` — alleen `fmltow` en `dlbrickade`
-- `client/main.lua` — toetsen, extras, HUD
-- `server/main.lua` — sync naar andere spelers
-- `html/` — Wegenwacht-paneel linksonder
+`/els` toont de toetsen in chat. Aanpassen: FiveM → Key Bindings → Pechhulp ELS.
 
 ## Browserdemo
 
-Open `html/index.html` in een browser om het paneel te zien zonder FiveM.
+Open `html/index.html` → **Instappen** om de kast te zien.

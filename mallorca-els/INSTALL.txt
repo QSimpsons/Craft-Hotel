@@ -1,19 +1,16 @@
-Mallorca ELS — pechhulp (alleen fmltow + dlbrickade)
-====================================================
+Mallorca ELS schakelkast (alleen fmltow + dlbrickade)
+=====================================================
 
-1. Zet de map mallorca-els in resources.
-2. server.cfg, NA je voertuigen:
+ensure fmltow
+ensure dlbrickade
+ensure mallorca-els
 
-   ensure fmltow
-   ensure dlbrickade
-   ensure mallorca-els
+Alleen als bestuurder in die wagen:
+1 = achter
+2 = zwaai (sweep)
+3 = vol
+0 = uit
+R = werklicht
+G = toon
 
-3. restart mallorca-els
-
-In de fmltow of dlbrickade (bestuurder):
-- Instappen = ELS gaat aan (cruise + paneel)
-- Uitstappen = ELS gaat uit
-- Q = zwaailichten cyclen
-- G = sirene (vanaf waarschuwing)
-
-Te voet of in een andere auto: geen ELS.
+Te voet: geen ELS. Uitstappen: alles uit.

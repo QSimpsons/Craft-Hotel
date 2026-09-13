@@ -3,8 +3,8 @@ game 'gta5'
 lua54 'yes'
 
 author 'Mallorca Roleplay'
-description 'ELS voor pechhulp: alleen fmltow en dlbrickade'
-version '1.0.0'
+description 'Pechhulp ELS-schakelkast: alleen fmltow en dlbrickade'
+version '2.0.0'
 
 ui_page 'html/index.html'
 

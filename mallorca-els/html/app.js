@@ -3,6 +3,8 @@
   const status = document.getElementById('status');
   const veh = document.getElementById('veh');
   const sirenBtn = document.getElementById('siren');
+  const sceneBtn = document.getElementById('scene');
+  const bar = document.getElementById('bar');
   const gate = document.getElementById('gate');
   const gateText = document.getElementById('gate-text');
   const enterBtn = document.getElementById('enter');
@@ -15,15 +17,27 @@
     panel.setAttribute('aria-hidden', 'true');
   }
 
+  function modeFor(data) {
+    if (data.scene) return 'scene';
+    const stage = Number(data.stage) || 0;
+    if (stage === 1) return 'rear';
+    if (stage === 2) return 'sweep';
+    if (stage >= 3) return 'full';
+    return 'off';
+  }
+
   function render(data = {}) {
     const stage = Number(data.stage) || 0;
-    document.querySelectorAll('.stages [data-stage]').forEach((btn) => {
-      btn.classList.toggle('on', Number(btn.getAttribute('data-stage')) <= stage && stage > 0);
+    document.querySelectorAll('.row [data-stage]').forEach((btn) => {
+      const value = Number(btn.getAttribute('data-stage'));
+      btn.classList.toggle('on', value === stage);
     });
     sirenBtn.classList.toggle('on', !!data.siren);
-    status.textContent = data.stageName || 'UIT';
+    sceneBtn.classList.toggle('on', !!data.scene);
+    status.textContent = data.scene ? 'WERKLICHT' : (data.stageName || 'UIT');
     veh.textContent = data.vehicle || data.model || 'fmltow / dlbrickade';
-    if (data.visible || stage > 0) {
+    bar.setAttribute('data-mode', modeFor(data));
+    if (data.visible) {
       panel.classList.add('visible');
       panel.setAttribute('aria-hidden', 'false');
     } else {
@@ -43,9 +57,11 @@
     hidePanel();
 
     const demo = [
-      { visible: true, stage: 1, stageName: 'CRUISE', siren: false, vehicle: 'FML Tow' },
-      { visible: true, stage: 2, stageName: 'WAARSCHUWING', siren: false, vehicle: 'DL Brickade' },
-      { visible: true, stage: 3, stageName: 'VOL', siren: true, vehicle: 'DL Brickade' }
+      { visible: true, stage: 0, stageName: 'UIT', siren: false, scene: false, vehicle: 'FML Tow' },
+      { visible: true, stage: 1, stageName: 'ACHTER', siren: false, scene: false, vehicle: 'FML Tow' },
+      { visible: true, stage: 2, stageName: 'ZWAAI', siren: false, scene: false, vehicle: 'DL Brickade' },
+      { visible: true, stage: 3, stageName: 'VOL', siren: true, scene: false, vehicle: 'DL Brickade' },
+      { visible: true, stage: 0, stageName: 'UIT', siren: false, scene: true, vehicle: 'FML Tow' }
     ];
     let i = 0;
 
@@ -60,7 +76,7 @@
       seated = true;
       enterBtn.hidden = true;
       exitBtn.hidden = false;
-      gateText.textContent = 'Je zit in de fmltow. ELS staat aan.';
+      gateText.textContent = 'Je zit in de wagen. Schakelkast aan (1/2/3/0 · R · G).';
       i = 0;
       render(demo[0]);
       stopCycle();
@@ -68,7 +84,7 @@
         if (!seated) return;
         i += 1;
         render(demo[i % demo.length]);
-      }, 1600);
+      }, 1700);
     });
 
     exitBtn.addEventListener('click', () => {

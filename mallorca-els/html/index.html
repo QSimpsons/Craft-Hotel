@@ -7,23 +7,25 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="panel" class="panel" aria-hidden="true">
-    <div class="sunset"></div>
-    <header>
-      <span class="crest">WW</span>
-      <div>
-        <strong>Wegenwacht ELS</strong>
-        <small id="veh">fmltow / dlbrickade</small>
-      </div>
-    </header>
-    <div class="stages">
-      <button type="button" data-stage="1">L1</button>
-      <button type="button" data-stage="2">L2</button>
-      <button type="button" data-stage="3">L3</button>
-      <button type="button" id="siren" class="siren">SIRENE</button>
+  <div id="panel" class="box" aria-hidden="true">
+    <div class="box-top">
+      <span class="tag">PECHHULP</span>
+      <small id="veh">fmltow / dlbrickade</small>
+    </div>
+    <div id="bar" class="bar" data-mode="off">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+    <div class="row">
+      <button type="button" data-stage="1">1 ACHTER</button>
+      <button type="button" data-stage="2">2 ZWAAI</button>
+      <button type="button" data-stage="3">3 VOL</button>
+    </div>
+    <div class="row">
+      <button type="button" id="scene">R WERK</button>
+      <button type="button" id="siren">G TOON</button>
+      <button type="button" data-stage="0">0 UIT</button>
     </div>
     <p id="status">UIT</p>
-    <p class="hint">Alleen in de wagen · Q zwaailichten · G sirene</p>
   </div>
   <div id="gate" class="gate" hidden>
     <p id="gate-text">ELS staat uit. Stap eerst in de fmltow of dlbrickade.</p>
