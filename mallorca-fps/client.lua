@@ -1,5 +1,7 @@
 local isMenuOpen = false
 local currentFps = 0
+local currentPing = 0
+local saveToken = 0
 
 -- Tabel om bij te houden welke knoppen de speler heeft aanstaan
 local actieveModifiers = {
@@ -12,6 +14,28 @@ local actieveModifiers = {
     ["btn-zwartwit"] = false,
     ["btn-schaduwen"] = false
 }
+
+local function SyncMenuSettings()
+    SendNUIMessage({
+        action = "loadSettings",
+        settings = actieveModifiers
+    })
+end
+
+local function SaveSettingsToSql()
+    TriggerServerEvent('mallorca_fps:saveSettings', actieveModifiers)
+end
+
+local function QueueSaveSettings()
+    local delay = (Config and Config.SaveDebounceMs) or 400
+    saveToken = saveToken + 1
+    local token = saveToken
+    SetTimeout(delay, function()
+        if token == saveToken then
+            SaveSettingsToSql()
+        end
+    end)
+end
 
 -- FPS teller die op de achtergrond meedraait
 Citizen.CreateThread(function()
@@ -133,10 +157,12 @@ local function updateMenuStats()
 
     if zone == "BUBBLES" then zone = "Unknown" end
 
+    TriggerServerEvent('mallorca_fps:requestPing')
+
     SendNUIMessage({
         action = "updateStats",
         fps = tostring(currentFps),
-        ping = "25",
+        ping = tostring(currentPing),
         health = tostring(health),
         armor = tostring(armor),
         location = currentStreetName .. " (" .. zone .. ")"
@@ -149,6 +175,7 @@ RegisterCommand('fpspanel', function()
         isMenuOpen = true
         SetNuiFocus(true, true)
         SendNUIMessage({ action = "open" })
+        SyncMenuSettings()
         updateMenuStats()
     end
 end, false)
@@ -174,6 +201,7 @@ RegisterNUICallback('reset', function(data, cb)
     ClearTimecycleModifier()
     ClearExtraTimecycleModifier()
     ApplyShadows(false)
+    QueueSaveSettings()
     cb('ok')
 end)
 
@@ -190,6 +218,7 @@ RegisterNUICallback('toggleSetting', function(data, cb)
 
     -- Bereken direct de nieuwe in-game combinaties
     BerekenEnToepassenModifiers()
+    QueueSaveSettings()
     cb('ok')
 end)
 
@@ -213,4 +242,26 @@ Citizen.CreateThread(function()
             Citizen.Wait(500)
         end
     end
+end)
+
+RegisterNetEvent('mallorca_fps:loadSettings', function(settings)
+    if type(settings) ~= 'table' then return end
+    for k, _ in pairs(actieveModifiers) do
+        actieveModifiers[k] = settings[k] == true
+    end
+    BerekenEnToepassenModifiers()
+    SyncMenuSettings()
+end)
+
+RegisterNetEvent('mallorca_fps:updatePing', function(ping)
+    currentPing = tonumber(ping) or 0
+end)
+
+AddEventHandler('onClientResourceStart', function(res)
+    if res ~= GetCurrentResourceName() then return end
+    TriggerServerEvent('mallorca_fps:requestSettings')
+end)
+
+AddEventHandler('playerSpawned', function()
+    TriggerServerEvent('mallorca_fps:requestSettings')
 end)

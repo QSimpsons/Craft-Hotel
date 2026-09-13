@@ -1,4 +1,5 @@
 const RESOURCE_NAME = 'mallorca-fps';
+const cards = ['btn-laag', 'btn-boost', 'btn-texturen', 'btn-nogpu', 'btn-grafics', 'btn-vignette', 'btn-zwartwit', 'btn-schaduwen'];
 
 window.addEventListener('message', function(event) {
     let data = event.data;
@@ -7,6 +8,16 @@ window.addEventListener('message', function(event) {
         document.getElementById('panel-container').style.display = 'block';
     } else if (data.action === "close") {
         document.getElementById('panel-container').style.display = 'none';
+    } else if (data.action === "loadSettings") {
+        cards.forEach(id => {
+            const element = document.getElementById(id);
+            if (!element) return;
+            if (data.settings && data.settings[id]) {
+                element.classList.add('active');
+            } else {
+                element.classList.remove('active');
+            }
+        });
     } else if (data.action === "updateStats") {
         document.getElementById('stat-fps').innerText = data.fps;
         document.getElementById('stat-ping').innerText = data.ping;
@@ -23,8 +34,6 @@ function sendAction(name, status = null) {
         body: JSON.stringify({ setting: name, status: status })
     }).catch(err => console.log("Fetch error: ", err));
 }
-
-const cards = ['btn-laag', 'btn-boost', 'btn-texturen', 'btn-nogpu', 'btn-grafics', 'btn-vignette', 'btn-zwartwit', 'btn-schaduwen'];
 
 cards.forEach(id => {
     let element = document.getElementById(id);
@@ -69,4 +78,8 @@ if (!window.invokeNative) {
     document.getElementById('stat-location').innerText = 'Palma de Mallorca';
     document.body.style.background =
         'radial-gradient(120% 80% at 50% 0%, #3d1c08 0%, #120c08 55%, #070504 100%)';
+    window.postMessage({
+        action: 'loadSettings',
+        settings: { 'btn-laag': true, 'btn-schaduwen': true }
+    }, '*');
 }
