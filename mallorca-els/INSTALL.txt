@@ -7,8 +7,8 @@ ensure mallorca-els
 
 Alleen als bestuurder in die wagen:
 1 = achter
-2 = zwaai (sweep)
-3 = vol
+2 = zwaai (alle zwaailichten knipperen)
+3 = vol (hele balk flikkert, geen koplampen)
 0 = uit
 R = werklicht
 

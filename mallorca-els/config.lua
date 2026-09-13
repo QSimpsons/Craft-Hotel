@@ -4,11 +4,11 @@ Config = {}
 Config.Vehicles = {
     [`fmltow`] = {
         label = 'FML Tow',
-        extras = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }
+        extras = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
     },
     [`dlbrickade`] = {
         label = 'DL Brickade',
-        extras = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 }
+        extras = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
     }
 }
 
@@ -29,12 +29,15 @@ Config.Keys = {
 }
 
 Config.FlashMs = {
-    [2] = 140,
-    [3] = 90
+    [2] = 160,
+    [3] = 80
 }
 
+-- Noodknippers alleen op zwaai (2), niet op vol
 Config.UseHazardsFromStage = 2
-Config.HeadlightWigwag = true
+
+-- Koplampen nooit meenemen met ELS
+Config.HeadlightWigwag = false
 Config.ShowPanel = true
 
 -- Paneel verschijnt bij instappen, lampen blijven uit tot 1/2/3

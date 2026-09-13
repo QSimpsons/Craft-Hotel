@@ -113,9 +113,20 @@ local function disableAutoRepair(veh)
 end
 
 local function snapshotExtras(veh, cfg)
-    local list = filterExisting(veh, cfg.extras)
-    if #list == 0 then
-        list = filterExisting(veh, { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 })
+    local wanted = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
+    if type(cfg.extras) == 'table' then
+        for i = 1, #cfg.extras do
+            wanted[#wanted + 1] = cfg.extras[i]
+        end
+    end
+    local seen = {}
+    local list = {}
+    for i = 1, #wanted do
+        local extraId = wanted[i]
+        if extraId and not seen[extraId] and extraExists(veh, extraId) then
+            seen[extraId] = true
+            list[#list + 1] = extraId
+        end
     end
     local saved = {}
     for i = 1, #list do
@@ -154,6 +165,17 @@ local function rearExtras(list)
         return list
     end
     return out
+end
+
+local function flashGroups(veh, list, flash)
+    if #list == 0 then
+        setHazards(veh, flash)
+        return
+    end
+    for i = 1, #list do
+        local on = (i % 2 == 1) and flash or (not flash)
+        setExtra(veh, list[i], on)
+    end
 end
 
 local function muteSiren(veh)
@@ -206,7 +228,6 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
     if sceneOn then
         allExtras(veh, list, true)
         setHazards(veh, true)
-        SetVehicleLights(veh, 2)
         muteSiren(veh)
         return
     end
@@ -214,43 +235,33 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
     if st <= 0 then
         restoreExtras(veh, saved)
         setHazards(veh, false)
-        SetVehicleLights(veh, 0)
         muteSiren(veh)
         return
     end
 
-    local useHazards = Config.UseHazardsFromStage and st >= Config.UseHazardsFromStage
+    -- Koplampen nooit overrulen: speler houdt eigen lichtstand
+    SetVehicleLights(veh, 0)
+
+    local useHazards = Config.UseHazardsFromStage and st == Config.UseHazardsFromStage
     setHazards(veh, useHazards)
 
     if st == 1 then
         local rear = rearExtras(list)
         allExtras(veh, list, false)
         allExtras(veh, rear, true)
-        SetVehicleLights(veh, 0)
         muteSiren(veh)
         return
     end
 
     if st == 2 then
-        if #list > 0 then
-            local idx = sweepAt or 1
-            if idx < 1 then idx = 1 end
-            if idx > #list then idx = 1 end
-            for i = 1, #list do
-                setExtra(veh, list[i], i == idx or i == idx - 1)
-            end
-        else
-            setHazards(veh, flash)
-        end
-        SetVehicleLights(veh, 0)
+        -- Alle zwaailichten A/B knipperen
+        flashGroups(veh, list, flash)
     elseif st == 3 then
+        -- VOL: volledige balk aan/uit, geen koplampen
         if #list > 0 then
             allExtras(veh, list, flash)
         else
-            setHazards(veh, true)
-        end
-        if Config.HeadlightWigwag then
-            SetVehicleLights(veh, flash and 2 or 1)
+            setHazards(veh, flash)
         end
     end
 
@@ -410,17 +421,10 @@ CreateThread(function()
                 Wait(250)
             elseif stage <= 0 then
                 Wait(250)
-            elseif stage == 2 then
-                sweep = sweep + 1
-                if sweep > math.max(1, #extras) then
-                    sweep = 1
-                end
-                applyPattern(veh, stage, mineMeta(), true, flashOn, false, sweep)
-                Wait(Config.FlashMs[2] or 140)
-            elseif stage >= 3 then
+            elseif stage >= 2 then
                 flashOn = not flashOn
                 applyPattern(veh, stage, mineMeta(), true, flashOn, false, sweep)
-                Wait(Config.FlashMs[3] or 90)
+                Wait(Config.FlashMs[stage] or 80)
             else
                 applyPattern(veh, stage, mineMeta(), true, flashOn, false, sweep)
                 Wait(200)
@@ -455,8 +459,7 @@ CreateThread(function()
                         applyPattern(veh, st, remoteMeta[netId], false, remoteFlash, true, 1)
                     elseif st >= 2 then
                         anyFlash = true
-                        local idx = (math.floor(GetGameTimer() / (Config.FlashMs[2] or 140)) % math.max(1, #remoteMeta[netId].extras)) + 1
-                        applyPattern(veh, st, remoteMeta[netId], false, remoteFlash, false, idx)
+                        applyPattern(veh, st, remoteMeta[netId], false, remoteFlash, false, 1)
                     else
                         applyPattern(veh, st, remoteMeta[netId], false, remoteFlash, false, 1)
                     end
