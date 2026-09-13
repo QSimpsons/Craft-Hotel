@@ -32,8 +32,8 @@ if cfg.count('[`') != 2:
     errors.append('ELS config must whitelist exactly two vehicle models')
 if "stage1 = '1'" not in cfg or "scene = 'R'" not in cfg:
     errors.append('config keys must be 1/2/3/0 and R')
-if "siren = 'G'" in cfg:
-    errors.append('siren key should be removed')
+if 'left =' not in cfg or 'right =' not in cfg:
+    errors.append('config must split extras into left and right')
 
 manifest = (ROOT / 'fxmanifest.lua').read_text(encoding='utf-8')
 for needle in ("ui_page 'html/index.html'", 'client/main.lua', 'server/main.lua', 'config.lua'):
@@ -59,7 +59,8 @@ for needle in (
     'onClientResourceStart',
     'hideUi',
     'rearExtras',
-    'flashGroups',
+    'alternateSides',
+    'sideGroups',
 ):
     if needle not in lua:
         errors.append('client missing ' + needle)

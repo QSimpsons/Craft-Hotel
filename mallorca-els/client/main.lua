@@ -3,6 +3,8 @@ local myNetId = 0
 local stage = 0
 local scene = false
 local extras = {}
+local leftExtras = {}
+local rightExtras = {}
 local savedExtras = {}
 local flashOn = false
 local remoteFlash = false
@@ -41,7 +43,12 @@ local function setExtra(veh, extraId, enabled)
     if not extraExists(veh, extraId) then
         return
     end
-    SetVehicleExtra(veh, extraId, enabled and 0 or 1)
+    if enabled then
+        SetVehicleExtra(veh, extraId, 0)
+    else
+        SetVehicleExtra(veh, extraId, 1)
+        SetVehicleExtra(veh, extraId, 1)
+    end
 end
 
 local function filterExisting(veh, list)
@@ -167,14 +174,37 @@ local function rearExtras(list)
     return out
 end
 
-local function flashGroups(veh, list, flash)
-    if #list == 0 then
-        setHazards(veh, flash)
+local function sideGroups(veh, cfg, list)
+    local left = filterExisting(veh, cfg and cfg.left)
+    local right = filterExisting(veh, cfg and cfg.right)
+    if #left == 0 or #right == 0 then
+        left, right = {}, {}
+        for i = 1, #list do
+            if list[i] % 2 == 1 then
+                left[#left + 1] = list[i]
+            else
+                right[#right + 1] = list[i]
+            end
+        end
+    end
+    return left, right
+end
+
+local function alternateSides(veh, list, left, right, flash)
+    -- Eerst alles uit, anders blijft één kant vast branden
+    allExtras(veh, list, false)
+    if #left == 0 and #right == 0 then
+        allExtras(veh, list, flash)
         return
     end
-    for i = 1, #list do
-        local on = (i % 2 == 1) and flash or (not flash)
-        setExtra(veh, list[i], on)
+    if #left == 0 or #right == 0 then
+        allExtras(veh, list, flash)
+        return
+    end
+    if flash then
+        allExtras(veh, left, true)
+    else
+        allExtras(veh, right, true)
     end
 end
 
@@ -224,6 +254,8 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
 
     local list = (meta and meta.extras) or extras
     local saved = meta and meta.saved or savedExtras
+    local left = (meta and meta.left) or leftExtras
+    local right = (meta and meta.right) or rightExtras
 
     if sceneOn then
         allExtras(veh, list, true)
@@ -241,9 +273,7 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
 
     -- Koplampen nooit overrulen: speler houdt eigen lichtstand
     SetVehicleLights(veh, 0)
-
-    local useHazards = Config.UseHazardsFromStage and st == Config.UseHazardsFromStage
-    setHazards(veh, useHazards)
+    setHazards(veh, false)
 
     if st == 1 then
         local rear = rearExtras(list)
@@ -253,24 +283,18 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
         return
     end
 
-    if st == 2 then
-        -- Alle zwaailichten A/B knipperen
-        flashGroups(veh, list, flash)
-    elseif st == 3 then
-        -- VOL: volledige balk aan/uit, geen koplampen
-        if #list > 0 then
-            allExtras(veh, list, flash)
-        else
-            setHazards(veh, flash)
-        end
-    end
-
+    -- Links/rechts afwisselen: nooit beide kanten tegelijk
+    SetVehicleIndicatorLights(veh, 0, flash and true or false)
+    SetVehicleIndicatorLights(veh, 1, flash and false or true)
+    alternateSides(veh, list, left, right, flash)
     muteSiren(veh)
 end
 
 local function mineMeta()
     return {
         extras = extras,
+        left = leftExtras,
+        right = rightExtras,
         saved = savedExtras
     }
 end
@@ -291,6 +315,8 @@ local function resetMine(veh)
     myVehicle = 0
     myNetId = 0
     extras = {}
+    leftExtras = {}
+    rightExtras = {}
     savedExtras = {}
     profile = nil
     hideUi()
@@ -309,6 +335,7 @@ local function armVehicle(veh, cfg)
     end
     profile = cfg
     extras, savedExtras = snapshotExtras(veh, cfg)
+    leftExtras, rightExtras = sideGroups(veh, cfg, extras)
     local start = math.floor(tonumber(Config.StartStageOnEnter) or 0)
     if start < 0 then start = 0 end
     if start > 3 then start = 3 end
@@ -449,8 +476,11 @@ CreateThread(function()
                 if ok then
                     if not remoteMeta[netId] then
                         local list, saved = snapshotExtras(veh, cfg)
+                        local left, right = sideGroups(veh, cfg, list)
                         remoteMeta[netId] = {
                             extras = list,
+                            left = left,
+                            right = right,
                             saved = saved
                         }
                     end
