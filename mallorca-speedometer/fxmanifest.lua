@@ -4,8 +4,8 @@ lua54 'yes'
 
 name 'mallorca-speedometer'
 author 'Mallorca'
-description 'Volledige voertuig-HUD met SQL brandstof (tank, snelheid fluo oranje, motor, schade, pinkers, handrem)'
-version '1.2.0'
+description 'Complete voertuig speedometer: fluo oranje snelheid, tank (SQL), motor, schade, pinkers, handrem, lichten'
+version '1.3.0'
 
 ui_page 'html/index.html'
 

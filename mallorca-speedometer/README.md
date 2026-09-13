@@ -1,74 +1,48 @@
-# Mallorca Speedometer (compleet + SQL)
+# Mallorca Speedometer
 
-Complete FiveM-resource met **SQL brandstof-opslag**.
+Complete FiveM voertuig-HUD.
 
-## Installatie
+## Snelle installatie
 
-### 1. Resource
-Pak `mallorca-speedometer.zip` uit in je `resources` map, of kopieer de map `mallorca-speedometer`.
-
-### 2. SQL (eenmalig)
-Voer uit in je database (HeidiSQL / phpMyAdmin):
-
-`sql/install.sql`
-
-```sql
-ALTER TABLE `owned_vehicles`
-    ADD COLUMN `fuel` FLOAT NOT NULL DEFAULT 100.0;
-```
-
-### 3. server.cfg
-Zorg dat je database-connector draait (`oxmysql` of `mysql-async`), daarna:
+1. Map `mallorca-speedometer` in `resources` zetten  
+2. `sql/install.sql` uitvoeren in je database  
+3. In `server.cfg`:
 
 ```cfg
 ensure oxmysql
 ensure mallorca-speedometer
 ```
 
-## Bestanden
-
-```
-mallorca-speedometer/
-├── fxmanifest.lua
-├── config.lua
-├── README.md
-├── sql/
-│   └── install.sql          ← database
-├── client/
-│   └── main.lua
-├── server/
-│   └── main.lua             ← laden/opslaan fuel
-└── html/
-    ├── index.html
-    ├── style.css
-    ├── app.js
-    ├── voorbeeld.html
-    └── auto-demo.html
-```
+Zie ook `INSTALL.txt`.
 
 ## Functies
 
-| Onderdeel | Werking |
-|-----------|---------|
-| Snelheid | km/h in **fluo oranje** |
-| Tank | Ring + % · groen/geel/rood · **opgeslagen in SQL** |
-| Motor | Groen / geel / rood |
-| Schade | Dim / geel / rood |
-| Pinkers + noodknippers | Werken met pijltjestoetsen |
-| Handrem | Rood als aan |
-| Lichten | Groen als aan |
-
-## Config brandstof
-
-In `config.lua`:
-
-```lua
-Config.Fuel.UseDatabase = true   -- SQL aan/uit
-Config.Fuel.Consume = true       -- tank leegrijden
-Config.Fuel.Resource = ''        -- of 'LegacyFuel' / 'ox_fuel' (heeft voorrang)
-```
+| Onderdeel | Status |
+|-----------|--------|
+| Snelheid (fluo oranje) | ✅ |
+| Tankmeter + % | ✅ |
+| Tank opslaan in SQL | ✅ `owned_vehicles.fuel` |
+| Motor groen/geel/rood | ✅ |
+| Schade | ✅ |
+| Links / rechts pinker | ✅ |
+| Noodknippers | ✅ |
+| Handrem (rood) | ✅ |
+| Lichten | ✅ |
 
 ## Toetsen
 
-- Pijl links / rechts — pinkers  
-- Pijl omlaag — noodknippers  
+- **← / →** pinkers  
+- **↓** noodknippers  
+
+## Config brandstof
+
+```lua
+Config.Fuel.UseDatabase = true
+Config.Fuel.Consume = true
+Config.Fuel.Resource = ''          -- of 'LegacyFuel' / 'ox_fuel'
+Config.Fuel.Export = 'GetFuel'
+```
+
+## Preview
+
+Open `html/index.html` in een browser.
