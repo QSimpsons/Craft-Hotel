@@ -11,7 +11,7 @@ Config.RequireDuty = true
 
 -- Toetsen (ook aanpasbaar in FiveM Key Bindings)
 Config.Keys = {
-    menu = 'F6',
+    menu = 'F1',
     toggle = 'J' -- takelen / loskoppelen
 }
 

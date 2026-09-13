@@ -26,7 +26,7 @@ UPDATE users SET job = 'takel', job_grade = 3 WHERE identifier = 'jouw-identifie
 
 | Actie | Hoe |
 |--------|-----|
-| Tablet | **F6** of `/takel` |
+| Tablet | **F1** of `/takel` |
 | Takelen / loskoppelen | **J** |
 | Pechhulp vragen | `/takelhulp motor doet het niet` |
 | Depot | Marker bij Mallorca Takel, **E** |

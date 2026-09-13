@@ -14,7 +14,7 @@ Mallorca Takel — installatie
 
 In-game
 -------
-F6  = tablet
+F1  = tablet
 J   = takelen / loskoppelen
 /takelhulp [tekst] = pechhulp oproepen
 E bij depot / inbeslagname / ophaalmarker
