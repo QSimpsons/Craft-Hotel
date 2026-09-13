@@ -1,7 +1,7 @@
 (() => {
   const titles = {
     home: ['Overzicht', 'Depot · inbeslagname · pechhulp'],
-    tow: ['Takelen', 'Haak of flatbed — J om vast te maken'],
+    tow: ['Takelen', 'Haak of flatbed — O om vast te maken'],
     impound: ['Inbeslagname', 'Kentekens, reden en vrijgave'],
     calls: ['Oproepen', 'Spelers en NPC-pechhulp'],
     bill: ['Factuur', 'Stuur een rekening naar iemand in de buurt'],
@@ -141,7 +141,7 @@
     el.statHook.textContent = state.attached && state.attached.plate ? state.attached.plate : '—';
     el.statCalls.textContent = String((state.calls || []).length);
     el.statImpound.textContent = String((state.impounds || []).length);
-    el.homeLoad.textContent = vehicleLine(state.attached, 'Nog geen voertuig vastgemaakt. Gebruik J of de tab Takelen.');
+    el.homeLoad.textContent = vehicleLine(state.attached, 'Nog geen voertuig vastgemaakt. Gebruik O of de tab Takelen.');
     el.towTruck.textContent = vehicleLine(state.truck, 'Geen takelwagen in de buurt.');
     el.towTarget.textContent = vehicleLine(state.target, 'Ga achter (flatbed) of voor (haak) een voertuig staan.');
     el.towAttached.textContent = vehicleLine(state.attached, 'Leeg');
