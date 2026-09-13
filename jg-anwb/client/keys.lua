@@ -1,0 +1,126 @@
+local function ResourceStarted(name)
+    return type(name) == 'string' and name ~= '' and GetResourceState(name) == 'started'
+end
+
+local function Trim(value)
+    if value == nil then
+        return ''
+    end
+
+    return (tostring(value):gsub('^%s*(.-)%s*$', '%1'))
+end
+
+local function CallExport(resource, method, ...)
+    if not ResourceStarted(resource) then
+        return false
+    end
+
+    local args = { ... }
+    local ok = pcall(function()
+        exports[resource][method](table.unpack(args))
+    end)
+
+    return ok
+end
+
+GiveJobVehicleKeys = function(vehicle, plate, props)
+    plate = Trim(plate)
+
+    if plate == '' and type(props) == 'table' and props.plate then
+        plate = Trim(props.plate)
+    end
+
+    if plate == '' and vehicle and vehicle ~= 0 and DoesEntityExist(vehicle) then
+        plate = Trim(GetVehicleNumberPlateText(vehicle))
+    end
+
+    if (not props or type(props) ~= 'table') and vehicle and vehicle ~= 0 and ESX and ESX.Game then
+        props = ESX.Game.GetVehicleProperties(vehicle)
+    end
+
+    local methods = { 'giveCarKeys', 'GiveCarKeys', 'GiveKeys', 'GiveKey', 'giveKeys' }
+    local resources = {
+        'jg-givekey',
+        Config.Carkeys,
+        'jg-carkeys',
+        'qs-vehiclekeys',
+        'wasabi_carlock',
+        'qb-vehiclekeys',
+        'qbx_vehiclekeys',
+        'mk_vehiclekeys'
+    }
+
+    local tried = {}
+    for i = 1, #resources do
+        local resource = resources[i]
+        if resource and not tried[resource] then
+            tried[resource] = true
+            for m = 1, #methods do
+                if CallExport(resource, methods[m], plate, props, vehicle) then
+                    return true
+                end
+            end
+        end
+    end
+
+    -- Events blijven staan als vangnet; missende listeners crashen niet.
+    TriggerEvent('jg-givekey:client:giveCarKeys', plate, props, vehicle)
+    TriggerEvent('jg-carkeys:client:giveKeys', plate, props, vehicle)
+    TriggerEvent('vehiclekeys:client:SetOwner', plate)
+    TriggerEvent('cd_garage:AddKeys', plate)
+    return false
+end
+
+RemoveJobVehicleKeys = function(vehicle, plate, props)
+    plate = Trim(plate)
+
+    if plate == '' and vehicle and vehicle ~= 0 and DoesEntityExist(vehicle) then
+        plate = Trim(GetVehicleNumberPlateText(vehicle))
+    end
+
+    local resources = { 'jg-givekey', Config.Carkeys, 'jg-carkeys' }
+    local methods = { 'removeCarKeys', 'RemoveCarKeys', 'RemoveKeys', 'RemoveKey' }
+    local tried = {}
+
+    for i = 1, #resources do
+        local resource = resources[i]
+        if resource and not tried[resource] then
+            tried[resource] = true
+            for m = 1, #methods do
+                if CallExport(resource, methods[m], plate, props, vehicle) then
+                    return true
+                end
+            end
+        end
+    end
+
+    return false
+end
+
+SetJobVehicleFuel = function(vehicle, amount)
+    amount = amount or 100.0
+
+    if ResourceStarted(Config.Benzine) then
+        if CallExport(Config.Benzine, 'setFuel', vehicle, amount) then
+            return true
+        end
+        if CallExport(Config.Benzine, 'SetFuel', vehicle, amount) then
+            return true
+        end
+    end
+
+    if CallExport('LegacyFuel', 'SetFuel', vehicle, amount) then
+        return true
+    end
+
+    if ResourceStarted('ox_fuel') and vehicle and vehicle ~= 0 then
+        Entity(vehicle).state.fuel = amount
+        return true
+    end
+
+    if vehicle and vehicle ~= 0 and DoesEntityExist(vehicle) then
+        SetVehicleFuelLevel(vehicle, amount + 0.0)
+    end
+
+    return true
+end
