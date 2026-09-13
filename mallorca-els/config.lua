@@ -4,15 +4,15 @@ Config = {}
 Config.Vehicles = {
     [`fmltow`] = {
         label = 'FML Tow',
-        extras = { 1, 2, 3, 4 },
-        left = { 1, 3 },
-        right = { 2, 4 }
+        extras = { 1, 2 },
+        left = { 1 },
+        right = { 2 }
     },
     [`dlbrickade`] = {
         label = 'DL Brickade',
-        extras = { 1, 2, 3, 4 },
-        left = { 1, 3 },
-        right = { 2, 4 }
+        extras = { 1, 2 },
+        left = { 1 },
+        right = { 2 }
     }
 }
 
@@ -37,17 +37,17 @@ Config.FlashMs = {
     [3] = 80
 }
 
--- Pinkers / richtingaanwijzers: nooit aanraken
+-- Pinkers, achterlichten en remlichten: nooit aanraken
 Config.UseIndicators = false
-Config.IndicatorExtras = { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
-Config.LightExtras = { 1, 2, 3, 4 }
+Config.IndicatorExtras = { 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
+Config.LightExtras = { 1, 2 }
 
--- Koplampen nooit meenemen met ELS
+-- Koplampen, achterlichten en remlichten nooit meenemen met ELS
 Config.HeadlightWigwag = false
 Config.ShowPanel = true
 
--- Balk-emissives zonder geluid (veel addons zetten de 2e kant op de sirene-mesh)
-Config.MutedSirenLights = true
+-- Geen stille sirene: die laat achterlichten/remlichten vaak meeflikkeren
+Config.MutedSirenLights = false
 
 -- Paneel verschijnt bij instappen, lampen blijven uit tot 1/2/3
 Config.StartStageOnEnter = 0

@@ -51,7 +51,7 @@ end
 local function lightExtraIds()
     local list = Config.LightExtras
     if type(list) ~= 'table' or #list == 0 then
-        return { 1, 2, 3, 4 }
+        return { 1, 2 }
     end
     return list
 end
@@ -65,22 +65,6 @@ local function setExtra(veh, extraId, enabled)
         return
     end
     SetVehicleExtra(veh, extraId, enabled and 0 or 1)
-end
-
-local function restoreIndicatorExtras(veh)
-    local ignore = Config.IndicatorExtras
-    if type(ignore) ~= 'table' then
-        return
-    end
-    for i = 1, #ignore do
-        local extraId = ignore[i]
-        local wasOn = savedExtras[extraId]
-        if wasOn == nil then
-            SetVehicleExtra(veh, extraId, 1)
-        else
-            SetVehicleExtra(veh, extraId, wasOn and 0 or 1)
-        end
-    end
 end
 
 local function forceAllExtras(veh, on)
@@ -177,7 +161,21 @@ local function disableAutoRepair(veh)
 end
 
 local function snapshotExtras(veh, cfg)
-    local list = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
+    -- Alleen dakbalk. Achterlichten/remlicht/pinkers nooit in deze lijst.
+    local wanted = lightExtraIds()
+    if cfg and type(cfg.extras) == 'table' and #cfg.extras > 0 then
+        wanted = cfg.extras
+    end
+    local list = {}
+    for i = 1, #wanted do
+        local extraId = wanted[i]
+        if extraId and not isIndicatorExtra(extraId) then
+            list[#list + 1] = extraId
+        end
+    end
+    if #list == 0 then
+        list = { 1, 2 }
+    end
     local saved = {}
     for i = 1, #list do
         saved[list[i]] = extraIsOn(veh, list[i])
@@ -191,7 +189,7 @@ local function restoreExtras(veh, saved)
     end
     for extraId, wasOn in pairs(saved) do
         extraId = tonumber(extraId)
-        if extraId and extraId >= 1 and extraId <= 14 then
+        if extraId and extraId >= 1 and extraId <= 14 and not isIndicatorExtra(extraId) then
             SetVehicleExtra(veh, extraId, wasOn and 0 or 1)
         end
     end
@@ -302,9 +300,7 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
     local right = (meta and meta.right) or rightExtras
 
     if sceneOn then
-        restoreIndicatorExtras(veh)
         forceAllExtras(veh, true)
-        muteSiren(veh, false)
         return
     end
 
@@ -314,22 +310,16 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
         return
     end
 
-    -- Koplampen en richtingaanwijzers nooit meenemen
-    SetVehicleLights(veh, 0)
-    clearIndicators(veh)
-    restoreIndicatorExtras(veh)
-
+    -- Alleen extra 1/2 (dakbalk). Extras 3–14 en voertuigverlichting
+    -- blijven van GTA, anders flikkeren achterlichten en sterft het remlicht.
     if st == 1 then
         forceAllExtras(veh, false)
         forceEvenExtras(veh, true)
-        muteSiren(veh, false)
         return
     end
 
     local beat = math.floor(tonumber(flash) or 0)
     alternateSides(veh, list, left, right, beat)
-    restoreIndicatorExtras(veh)
-    muteSiren(veh, true)
 end
 
 local function mineMeta()
@@ -385,6 +375,7 @@ local function armVehicle(veh, cfg)
     scene = false
     strobe = 0
     disableAutoRepair(veh)
+    muteSiren(veh, false)
     if stage > 0 then
         applyPattern(veh, stage, mineMeta(), true, strobe, scene, 0)
         broadcast()
@@ -405,6 +396,7 @@ local function setStage(nextStage)
     if stage <= 0 then
         scene = false
     end
+    muteSiren(veh, false)
     applyPattern(veh, stage, mineMeta(), true, strobe, scene, 0)
     notify(('%s: %s'):format(Config.Locale.stage, Config.StageNames[stage] or 'UIT'))
     pushUi()
@@ -421,6 +413,7 @@ local function toggleScene()
         armVehicle(veh, cfg)
     end
     scene = not scene
+    muteSiren(veh, false)
     applyPattern(veh, stage, mineMeta(), true, strobe, scene, 0)
     notify(scene and Config.Locale.scene_on or Config.Locale.scene_off)
     pushUi()
@@ -543,6 +536,23 @@ CreateThread(function()
             waitMs = Config.FlashMs[3] or 90
         end
         Wait(waitMs)
+    end
+end)
+
+-- Remlicht blijft van GTA. Tijdens zwaai alsnog forceren als de speler remt,
+-- zodat extra-flikker van de balk het remlicht niet wegdrukt.
+CreateThread(function()
+    while true do
+        local veh = seatedDriver()
+        local ok = veh ~= 0 and isPechhulp(veh)
+        if ok then
+            if IsControlPressed(0, 72) or IsControlPressed(0, 76) then
+                SetVehicleBrakeLights(veh, true)
+            end
+            Wait(0)
+        else
+            Wait(250)
+        end
     end
 end)
 

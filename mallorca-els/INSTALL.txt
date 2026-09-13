@@ -13,4 +13,5 @@ Alleen als bestuurder in die wagen:
 R = werklicht
 
 Geen sirene. Geen richtingaanwijzers (pinkers zwaaien niet mee).
+Achterlichten/remlicht flikkeren niet mee; remmen tijdens zwaai blijft werken.
 Te voet: geen ELS. Uitstappen: alles uit.

@@ -72,12 +72,22 @@ if 'forceAllExtras' not in lua:
     errors.append('client missing forceAllExtras')
 if 'SetVehicleLights(veh, flash and 2' in lua or 'SetVehicleLights(veh, 2)' in lua:
     errors.append('ELS must not flash or force headlights')
+if 'SetVehicleLights(veh, 0)' in lua:
+    errors.append('SetVehicleLights resets taillights and kills brake lights')
+if 'SetVehicleBrakeLights' not in lua:
+    errors.append('client must force brake lights while braking during ELS')
+if 'MutedSirenLights = true' in cfg:
+    errors.append('muted siren lights must stay off; they strobe taillights')
+if 'LightExtras = { 1, 2 }' not in cfg:
+    errors.append('only extras 1 and 2 may strobe; 3-14 are tails/indicators')
 if 'IndicatorExtras' not in cfg or 'LightExtras' not in cfg:
     errors.append('config must separate lightbar extras from indicator extras')
 if 'isIndicatorExtra' not in lua:
     errors.append('client missing isIndicatorExtra')
 if 'SetVehicleIndicatorLights(veh, 0, true)' in lua or 'SetVehicleIndicatorLights(veh, 1, true)' in lua:
     errors.append('ELS must not turn native indicators on')
+if 'restoreIndicatorExtras' in lua:
+    errors.append('do not rewrite extras 3-14 every flash; that kills remlicht')
 
 server = (ROOT / 'server/main.lua').read_text(encoding='utf-8')
 for needle in ('mallorca-els:update', 'mallorca-els:apply', 'fmltow', 'dlbrickade', 'scene'):
