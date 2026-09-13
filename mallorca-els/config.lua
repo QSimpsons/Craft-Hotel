@@ -4,15 +4,15 @@ Config = {}
 Config.Vehicles = {
     [`fmltow`] = {
         label = 'FML Tow',
-        extras = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 },
-        left = { 1, 3, 5, 7, 9, 11, 13 },
-        right = { 2, 4, 6, 8, 10, 12, 14 }
+        extras = { 1, 2, 3, 4 },
+        left = { 1, 3 },
+        right = { 2, 4 }
     },
     [`dlbrickade`] = {
         label = 'DL Brickade',
-        extras = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 },
-        left = { 1, 3, 5, 7, 9, 11, 13 },
-        right = { 2, 4, 6, 8, 10, 12, 14 }
+        extras = { 1, 2, 3, 4 },
+        left = { 1, 3 },
+        right = { 2, 4 }
     }
 }
 
@@ -37,8 +37,10 @@ Config.FlashMs = {
     [3] = 80
 }
 
--- Pinkers (4 knipperlichten) doen NOOIT mee met ELS
+-- Pinkers / richtingaanwijzers: nooit aanraken
 Config.UseIndicators = false
+Config.IndicatorExtras = { 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 }
+Config.LightExtras = { 1, 2, 3, 4 }
 
 -- Koplampen nooit meenemen met ELS
 Config.HeadlightWigwag = false

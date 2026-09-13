@@ -72,10 +72,12 @@ if 'forceAllExtras' not in lua:
     errors.append('client missing forceAllExtras')
 if 'SetVehicleLights(veh, flash and 2' in lua or 'SetVehicleLights(veh, 2)' in lua:
     errors.append('ELS must not flash or force headlights')
+if 'IndicatorExtras' not in cfg or 'LightExtras' not in cfg:
+    errors.append('config must separate lightbar extras from indicator extras')
+if 'isIndicatorExtra' not in lua:
+    errors.append('client missing isIndicatorExtra')
 if 'SetVehicleIndicatorLights(veh, 0, true)' in lua or 'SetVehicleIndicatorLights(veh, 1, true)' in lua:
-    errors.append('ELS must not turn the four indicators on')
-if 'clearIndicators' not in lua:
-    errors.append('client missing clearIndicators')
+    errors.append('ELS must not turn native indicators on')
 
 server = (ROOT / 'server/main.lua').read_text(encoding='utf-8')
 for needle in ('mallorca-els:update', 'mallorca-els:apply', 'fmltow', 'dlbrickade', 'scene'):

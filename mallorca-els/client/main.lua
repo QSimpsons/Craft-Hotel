@@ -35,30 +35,76 @@ local function extraIsOn(veh, extraId)
     return IsVehicleExtraTurnedOn(veh, extraId)
 end
 
+local function isIndicatorExtra(extraId)
+    local ignore = Config.IndicatorExtras
+    if type(ignore) ~= 'table' then
+        return extraId >= 5
+    end
+    for i = 1, #ignore do
+        if ignore[i] == extraId then
+            return true
+        end
+    end
+    return false
+end
+
+local function lightExtraIds()
+    local list = Config.LightExtras
+    if type(list) ~= 'table' or #list == 0 then
+        return { 1, 2, 3, 4 }
+    end
+    return list
+end
+
 local function setExtra(veh, extraId, enabled)
     extraId = tonumber(extraId)
     if not extraId or extraId < 1 or extraId > 14 then
         return
     end
-    -- Addon-balken liegen vaak met DoesExtraExist; altijd zetten
+    if isIndicatorExtra(extraId) then
+        return
+    end
     SetVehicleExtra(veh, extraId, enabled and 0 or 1)
 end
 
+local function restoreIndicatorExtras(veh)
+    local ignore = Config.IndicatorExtras
+    if type(ignore) ~= 'table' then
+        return
+    end
+    for i = 1, #ignore do
+        local extraId = ignore[i]
+        local wasOn = savedExtras[extraId]
+        if wasOn == nil then
+            SetVehicleExtra(veh, extraId, 1)
+        else
+            SetVehicleExtra(veh, extraId, wasOn and 0 or 1)
+        end
+    end
+end
+
 local function forceAllExtras(veh, on)
-    for extraId = 1, 14 do
-        setExtra(veh, extraId, on)
+    local list = lightExtraIds()
+    for i = 1, #list do
+        setExtra(veh, list[i], on)
     end
 end
 
 local function forceOddExtras(veh, on)
-    for extraId = 1, 13, 2 do
-        setExtra(veh, extraId, on)
+    local list = lightExtraIds()
+    for i = 1, #list do
+        if list[i] % 2 == 1 then
+            setExtra(veh, list[i], on)
+        end
     end
 end
 
 local function forceEvenExtras(veh, on)
-    for extraId = 2, 14, 2 do
-        setExtra(veh, extraId, on)
+    local list = lightExtraIds()
+    for i = 1, #list do
+        if list[i] % 2 == 0 then
+            setExtra(veh, list[i], on)
+        end
     end
 end
 
@@ -144,7 +190,10 @@ local function restoreExtras(veh, saved)
         return
     end
     for extraId, wasOn in pairs(saved) do
-        setExtra(veh, extraId, wasOn)
+        extraId = tonumber(extraId)
+        if extraId and extraId >= 1 and extraId <= 14 then
+            SetVehicleExtra(veh, extraId, wasOn and 0 or 1)
+        end
     end
 end
 
@@ -253,23 +302,22 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
     local right = (meta and meta.right) or rightExtras
 
     if sceneOn then
+        restoreIndicatorExtras(veh)
         forceAllExtras(veh, true)
-        clearIndicators(veh)
         muteSiren(veh, false)
         return
     end
 
     if st <= 0 then
         restoreExtras(veh, saved)
-        forceAllExtras(veh, false)
-        clearIndicators(veh)
         muteSiren(veh, false)
         return
     end
 
-    -- Koplampen en pinkers nooit meenemen
+    -- Koplampen en richtingaanwijzers nooit meenemen
     SetVehicleLights(veh, 0)
     clearIndicators(veh)
+    restoreIndicatorExtras(veh)
 
     if st == 1 then
         forceAllExtras(veh, false)
@@ -280,6 +328,7 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
 
     local beat = math.floor(tonumber(flash) or 0)
     alternateSides(veh, list, left, right, beat)
+    restoreIndicatorExtras(veh)
     muteSiren(veh, true)
 end
 

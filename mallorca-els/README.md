@@ -22,7 +22,7 @@ Alleen als bestuurder van die twee wagens. Te voet: niets. Uitstappen: alles uit
 | **0** | Alles uit |
 | **R** | Werklicht |
 
-Geen sirene, geen toon, **geen pinkers** (de 4 knipperlichten doen niet mee).
+Geen sirene, geen toon, **geen richtingaanwijzers** (pinkers zwaaien niet mee).
 
 `/els` toont de toetsen in chat.
 
