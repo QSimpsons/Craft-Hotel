@@ -1,0 +1,18 @@
+Mallorca ELS — pechhulp (alleen fmltow + dlbrickade)
+====================================================
+
+1. Zet de map mallorca-els in resources.
+2. server.cfg, NA je voertuigen:
+
+   ensure fmltow
+   ensure dlbrickade
+   ensure mallorca-els
+
+3. restart mallorca-els
+
+In de fmltow of dlbrickade (bestuurder):
+Q = zwaailichten (uit / cruise / waarschuwing / vol)
+G = sirene (vanaf waarschuwing)
+Claxon = korte sirene
+
+Andere voertuigen: geen ELS.
