@@ -120,6 +120,9 @@ function Tow.EnsureControl(entity)
 end
 
 function Tow.IsClassAllowed(vehicle)
+    if Config.AllowAllVehicles then
+        return true
+    end
     local class = GetVehicleClass(vehicle)
     return Config.AllowedClasses[class] == true
 end
@@ -201,7 +204,7 @@ function Tow.FindTarget(tow)
     if target == 0 then
         target = closestFromPoint(GetEntityCoords(tow), Config.TowSearchDistance or 12.0, tow)
     end
-    if target == 0 or Tow.IsUsableTow(target) then
+    if target == 0 or (not Config.AllowAllVehicles and Tow.IsUsableTow(target)) then
         return 0
     end
     return target
@@ -309,7 +312,7 @@ function Tow.Attach(specificTarget)
     if target == 0 or target == tow then
         return false, 'no_target'
     end
-    if Tow.IsUsableTow(target) then
+    if not Config.AllowAllVehicles and Tow.IsUsableTow(target) then
         return false, 'class_blocked'
     end
 

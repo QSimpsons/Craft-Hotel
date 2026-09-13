@@ -107,12 +107,20 @@ Config.Prices = {
     npcCallReward = 1200
 }
 
--- Alleen deze voertuigklassen mogen getakeld worden
--- 0-12 auto/moto/van, 17 service, 18 emergency, 20 commercial
+-- Alle voertuigen mogen getakeld worden (true = geen klassefilter, dus ook
+-- fietsen, boten, helikopters, vliegtuigen, leger en treinen)
+Config.AllowAllVehicles = true
+
+-- Wordt alleen gebruikt als Config.AllowAllVehicles = false.
+-- Klassen: 0-7 auto's, 8 motor, 9 offroad, 10 industrieel, 11 utility, 12 van,
+-- 13 fiets, 14 boot, 15 heli, 16 vliegtuig, 17 service, 18 hulpdienst,
+-- 19 leger, 20 commercieel, 21 trein
 Config.AllowedClasses = {
     [0] = true, [1] = true, [2] = true, [3] = true, [4] = true,
     [5] = true, [6] = true, [7] = true, [8] = true, [9] = true,
-    [10] = true, [11] = true, [12] = true, [17] = true, [18] = true, [20] = true
+    [10] = true, [11] = true, [12] = true, [13] = true, [14] = true,
+    [15] = true, [16] = true, [17] = true, [18] = true, [19] = true,
+    [20] = true, [21] = true
 }
 
 -- Alleen fmltow en dlbrickade

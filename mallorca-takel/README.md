@@ -48,6 +48,8 @@ Toetsen aanpassen: FiveM → Settings → Key Bindings → FiveM.
 
 Alles staat in `config.lua`: depot-coördinaten, prijzen, jobnaam, toegestane voertuigklassen en NPC-spots.
 
+- `Config.AllowAllVehicles = true` — takel **alle** voertuigen (ook fietsen, boten, helikopters, vliegtuigen, leger en treinen). Zet op `false` om alleen de klassen in `Config.AllowedClasses` toe te staan.
+
 ## Browserdemo
 
 Open `html/index.html` of `html/auto-demo.html` in een browser om de tablet te zien zonder FiveM.
