@@ -26,3 +26,22 @@ AddEventHandler('jg-anwb:server:wash:vehicle', function()
     local xPlayer = ESX.GetPlayerFromId(source)
         xPlayer.removeInventoryItem('washand', 1)
 end)
+
+RegisterNetEvent('jg-anwb:server:toggleDuty', function()
+    local src = source
+    local xPlayer = ESX.GetPlayerFromId(src)
+    if not xPlayer or not xPlayer.job then
+        return
+    end
+
+    local jobName = xPlayer.job.name
+    local grade = xPlayer.job.grade or 0
+
+    if jobName == 'mechanic' then
+        xPlayer.setJob('offmechanic', grade)
+        TriggerClientEvent('esx:showNotification', src, 'Je bent uitgeklokt.')
+    elseif jobName == 'offmechanic' then
+        xPlayer.setJob('mechanic', grade)
+        TriggerClientEvent('esx:showNotification', src, 'Je bent ingeklokt.')
+    end
+end)

@@ -1,4 +1,4 @@
-print('^2[jg-anwb] client.lua v3 geladen (functionDefine-fix)^7')
+print('^2[jg-anwb] client.lua v4 geladen (kleedkamer-fix)^7')
 
 ESX = nil
 
@@ -312,25 +312,24 @@ GetGear = function()
 end
 
 OnOffDuty = function()
-	exports[''..Config.Jobsmenu..'']:ToggleDuty(ESX.PlayerData.job.name)
+	SafeToggleDuty()
 end
 
 OpenManagement = function()
-	exports[''..Config.Jobsmenu..'']:OpenManagementMenu(ESX.PlayerData.job.name)
+	SafeOpenManagement()
 end
 
 RegisterNetEvent('jg-anwb:client:own:cloakroom')
 AddEventHandler('jg-anwb:client:own:cloakroom', function()
 	if ESX.PlayerData.job.name == 'mechanic' then
-		exports[''..Config.Kleding..'']:openSavedOutfits()
-		--exports['ox_appearance']:showOutfitMenu()
+		OpenSavedOutfitsMenu()
 	end
 end)
 
 RegisterNetEvent('jg-anwb:client:anwb:cloakroom')
 AddEventHandler('jg-anwb:client:anwb:cloakroom', function()
 	if ESX.PlayerData.job.name == 'mechanic' then
-		exports[''..Config.Jobsmenu..'']:OpenOutfitMenu(Config.Outfits)
+		OpenJobOutfitMenu(Config.Outfits)
 	end
 end)
 

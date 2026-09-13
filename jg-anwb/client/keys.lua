@@ -10,7 +10,7 @@ local function Trim(value)
     return (tostring(value):gsub('^%s*(.-)%s*$', '%1'))
 end
 
-local function CallExport(resource, method, ...)
+SafeCallExport = function(resource, method, ...)
     if not ResourceStarted(resource) then
         return false
     end
@@ -21,6 +21,23 @@ local function CallExport(resource, method, ...)
     end)
 
     return ok
+end
+
+local CallExport = SafeCallExport
+
+SafeNotify = function(nType, message, duration)
+    duration = duration or 4000
+    if Config and SafeCallExport(Config.Notify, 'Notify', nType, message, duration) then
+        return true
+    end
+    if ESX and ESX.ShowNotification then
+        ESX.ShowNotification(message)
+        return true
+    end
+    BeginTextCommandThefeedPost('STRING')
+    AddTextComponentSubstringPlayerName(message)
+    EndTextCommandThefeedPostTicker(false, false)
+    return true
 end
 
 GiveJobVehicleKeys = function(vehicle, plate, props)
