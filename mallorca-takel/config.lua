@@ -37,8 +37,8 @@ Config.AllowCurrentVehicle = true
 
 -- Extra spawncodes van jouw eigen takelwagens (addons)
 Config.ExtraTowModels = {
-    -- 'jouwflatbed',
-    -- 'jouwtowtruck',
+    'fmltow',
+    'dlbrickade',
 }
 
 function Config.IsAllowedJob(name)
@@ -84,8 +84,35 @@ Config.AllowedClasses = {
     [10] = true, [11] = true, [12] = true, [17] = true, [18] = true, [20] = true
 }
 
--- Takelwagens: hook = kraan, flatbed = laadbak
+-- Takelwagens: hook = GTA-haak (alleen towtruck), flatbed = laadbak (ook addons)
 Config.TowVehicles = {
+    [`fmltow`] = {
+        type = 'flatbed',
+        label = 'FML Tow',
+        bone = 'bodyshell',
+        offset = vector3(0.0, -1.85, 0.95),
+        rotation = vector3(0.0, 0.0, 0.0),
+        extraOffsets = {
+            vector3(0.0, -1.85, 0.95),
+            vector3(0.0, -2.10, 1.05),
+            vector3(0.0, -1.55, 0.85),
+            vector3(0.0, -2.40, 1.15)
+        }
+    },
+    [`dlbrickade`] = {
+        type = 'flatbed',
+        label = 'DL Brickade',
+        bone = 'bodyshell',
+        offset = vector3(0.0, -4.10, 1.25),
+        rotation = vector3(0.0, 0.0, 0.0),
+        extraOffsets = {
+            vector3(0.0, -4.10, 1.25),
+            vector3(0.0, -3.60, 1.15),
+            vector3(0.0, -4.60, 1.35),
+            vector3(0.0, -3.20, 1.05),
+            vector3(0.0, -5.00, 1.40)
+        }
+    },
     [`towtruck`] = {
         type = 'hook',
         label = 'Takelwagen'
@@ -130,18 +157,16 @@ Config.Impound = {
 }
 
 Config.GarageVehicles = {
+    { model = 'fmltow', label = 'FML Tow', minGrade = 0 },
+    { model = 'dlbrickade', label = 'DL Brickade', minGrade = 0 },
     { model = 'flatbed', label = 'Flatbed', minGrade = 0 },
-    { model = 'towtruck', label = 'Takelwagen', minGrade = 0 },
-    { model = 'towtruck2', label = 'Takelwagen Tow', minGrade = 1 },
-    { model = 'slamtruck', label = 'Slamtruck', minGrade = 2 }
+    { model = 'towtruck', label = 'Takelwagen', minGrade = 0 }
 }
 
 -- Wagens die fysiek bij het depot staan (oogje: Takelwagen pakken)
 Config.ParkedVehicles = {
-    { model = 'flatbed', label = 'Flatbed', plate = 'TAKEL1', coords = vector4(476.68, -1317.52, 29.21, 305.0) },
-    { model = 'towtruck', label = 'Takelwagen', plate = 'TAKEL2', coords = vector4(474.12, -1309.88, 29.21, 305.0) },
-    { model = 'towtruck2', label = 'Takelwagen Tow', plate = 'TAKEL3', coords = vector4(487.55, -1332.40, 29.21, 300.0) },
-    { model = 'slamtruck', label = 'Slamtruck', plate = 'TAKEL4', coords = vector4(491.90, -1338.15, 29.21, 298.0) }
+    { model = 'fmltow', label = 'FML Tow', plate = 'FMLTOW', coords = vector4(476.68, -1317.52, 29.21, 305.0) },
+    { model = 'dlbrickade', label = 'DL Brickade', plate = 'BRICK1', coords = vector4(487.55, -1332.40, 29.21, 300.0) }
 }
 
 -- NPC-proefritten / pechhulp-oproepen (zet op false om alleen spelersoproepen te gebruiken)

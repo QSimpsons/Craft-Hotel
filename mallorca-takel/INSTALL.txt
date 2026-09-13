@@ -16,8 +16,8 @@ Mallorca Takel — installatie
 In-game
 -------
 F1  = tablet
-O   = takelen / loskoppelen (of oogje op het voertuig)
-Oogje op auto = Voertuig takelen / Takelhulp vragen
+O   = takelen / loskoppelen (in fmltow of dlbrickade)
+Oogje op auto = Voertuig takelen
 Oogje op takelwagen bij depot = Takelwagen pakken
 /takelhulp [tekst] = pechhulp oproepen
 E bij depot / inbeslagname / ophaalmarker

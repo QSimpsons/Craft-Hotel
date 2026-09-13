@@ -24,7 +24,7 @@ ensure mallorca-takel
 | Actie | Hoe |
 |--------|-----|
 | Tablet | **F1**, `/takel` of oogje op het depot |
-| Takelen / loskoppelen | **Oogje** op het voertuig, of **O** |
+| Takelen / loskoppelen | Stap in **fmltow** of **dlbrickade**, daarna oogje of **O** |
 | Takelwagen pakken | Oogje op de wagens bij het depot |
 | Pechhulp vragen | Oogje op je auto, of `/takelhulp` |
 | Depot | Marker bij Mallorca Takel, **E** |
@@ -35,7 +35,7 @@ Toetsen aanpassen: FiveM → Settings → Key Bindings → FiveM.
 
 ## Wat zit erin
 
-- Werkt met job **mechanic / mecano / takel** en jouw eigen takelwagens
+- Werkt met **fmltow** en **dlbrickade** (jouw takelwagens)
 - Oogje (ox_target): vanuit de wagen een auto aankijken → takelen
 - Dienst aan/uit
 - SQL-inbeslagname (`mallorca_impound`)

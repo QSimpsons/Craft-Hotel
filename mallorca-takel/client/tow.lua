@@ -56,10 +56,6 @@ function Tow.GetProfile(vehicle)
         if isHookModel(model) then
             return defaultHook()
         end
-        local extraName = string.lower(GetDisplayNameFromVehicleModel(model) or '')
-        if extraName:find('tow', 1, true) or extraName:find('wreck', 1, true) then
-            return defaultHook()
-        end
         return defaultFlatbed()
     end
 
@@ -68,10 +64,16 @@ function Tow.GetProfile(vehicle)
     end
 
     local name = string.lower(GetDisplayNameFromVehicleModel(model) or '')
-    if name:find('tow', 1, true) or name:find('wreck', 1, true) then
+    if name == 'fmltow' or name:find('fmltow', 1, true) then
+        return Config.TowVehicles[`fmltow`] or defaultFlatbed()
+    end
+    if name == 'dlbrickade' or name:find('brickade', 1, true) then
+        return Config.TowVehicles[`dlbrickade`] or defaultFlatbed()
+    end
+    if name == 'towtruck' or name == 'towtruck2' then
         return defaultHook()
     end
-    if name:find('flat', 1, true) or name:find('slam', 1, true) or name:find('takel', 1, true) or name:find('bed', 1, true) then
+    if name:find('flat', 1, true) or name:find('slam', 1, true) or name:find('takel', 1, true) then
         return defaultFlatbed()
     end
 
@@ -221,44 +223,50 @@ local function prepareEntity(entity)
     end
 end
 
+local attachFlatbed
+
 local function attachHook(tow, target)
     prepareEntity(target)
     prepareEntity(tow)
-    SetVehicleTowTruckArmPosition(tow, 1.0)
-    Wait(200)
-    AttachVehicleToTowTruck(tow, target, true, 0.0, 0.0, 0.0)
-    Wait(150)
-    if IsVehicleAttachedToTowTruck(tow, target) or IsEntityAttachedToEntity(target, tow) then
-        return true
+    if SetVehicleTowTruckArmPosition then
+        SetVehicleTowTruckArmPosition(tow, 1.0)
+        Wait(200)
     end
-    AttachVehicleToTowTruck(tow, target, false, 0.0, 0.0, 0.0)
-    Wait(150)
-    if IsVehicleAttachedToTowTruck(tow, target) or IsEntityAttachedToEntity(target, tow) then
-        return true
+    if AttachVehicleToTowTruck then
+        AttachVehicleToTowTruck(tow, target, true, 0.0, 0.0, 0.0)
+        Wait(150)
+        if (IsVehicleAttachedToTowTruck and IsVehicleAttachedToTowTruck(tow, target)) or IsEntityAttachedToEntity(target, tow) then
+            return true
+        end
+        AttachVehicleToTowTruck(tow, target, false, 0.0, 0.0, 0.0)
+        Wait(150)
+        if (IsVehicleAttachedToTowTruck and IsVehicleAttachedToTowTruck(tow, target)) or IsEntityAttachedToEntity(target, tow) then
+            return true
+        end
     end
-    local bone = GetEntityBoneIndexByName(tow, 'bodyshell')
-    if bone == -1 then
-        bone = GetEntityBoneIndexByName(tow, 'chassis')
-    end
-    if bone == -1 then bone = 0 end
-    AttachEntityToEntity(target, tow, bone, 0.0, 2.8, 0.35, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
-    return IsEntityAttachedToEntity(target, tow) or IsVehicleAttachedToTowTruck(tow, target)
+    return attachFlatbed(tow, target, defaultFlatbed())
 end
 
-local function attachFlatbed(tow, target, cfg)
+attachFlatbed = function(tow, target, cfg)
     prepareEntity(target)
     prepareEntity(tow)
 
-    local bones = { cfg.bone or 'bodyshell', 'bodyshell', 'chassis', 'chassis_dummy', 'boot' }
-    local offsets = {
-        cfg.offset or vector3(0.0, -2.0, 1.0),
-        vector3(0.0, -2.2, 1.05),
-        vector3(0.0, -1.7, 0.9),
-        vector3(0.0, -2.5, 1.15),
-        vector3(0.0, -1.4, 0.65)
-    }
+    local bones = { cfg.bone or 'bodyshell', 'bodyshell', 'chassis', 'chassis_dummy', 'boot', 'misc_a' }
+    local offsets = {}
+    if cfg.extraOffsets then
+        for i = 1, #cfg.extraOffsets do
+            offsets[#offsets + 1] = cfg.extraOffsets[i]
+        end
+    end
+    offsets[#offsets + 1] = cfg.offset or vector3(0.0, -2.0, 1.0)
+    offsets[#offsets + 1] = vector3(0.0, -2.2, 1.05)
+    offsets[#offsets + 1] = vector3(0.0, -1.7, 0.9)
+    offsets[#offsets + 1] = vector3(0.0, -2.5, 1.15)
+    offsets[#offsets + 1] = vector3(0.0, -3.6, 1.2)
+    offsets[#offsets + 1] = vector3(0.0, -4.1, 1.25)
     local rot = cfg.rotation or vector3(0.0, 0.0, 0.0)
 
+    local attached = false
     for b = 1, #bones do
         local bone = GetEntityBoneIndexByName(tow, bones[b])
         if bone ~= -1 or b == #bones then
@@ -271,14 +279,15 @@ local function attachFlatbed(tow, target, cfg)
                     rot.x, rot.y, rot.z,
                     false, false, true, false, 20, true
                 )
-                Wait(50)
+                Wait(40)
                 if IsEntityAttachedToEntity(target, tow) then
                     return true
                 end
+                attached = true
             end
         end
     end
-    return IsEntityAttachedToEntity(target, tow)
+    return attached or IsEntityAttachedToEntity(target, tow)
 end
 
 function Tow.Attach(specificTarget)
