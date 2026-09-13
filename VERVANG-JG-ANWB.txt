@@ -1,0 +1,18 @@
+JE DRAAIT NOG EEN OUDE client.lua
+=================================
+
+De error op regel 166 (functionDefine) bestaat NIET in de nieuwe client.lua.
+In de nieuwe file is regel 166 alleen een afstandsberekening.
+
+Daarom: verwijder de hele map jg-anwb op de server en zet de map
+jg-anwb uit deze zip er terug voor in de plaats. Niet 1 bestand
+eroverheen kopieren.
+
+1. Stop de server of:  ensure jg-anwb stop
+2. Verwijder resources/.../jg-anwb  (de hele map)
+3. Kopieer de map jg-anwb uit de zip naar resources
+4. ensure jg-anwb
+5. In F8 moet staan:  [jg-anwb] client.lua v3 geladen (functionDefine-fix)
+
+Als die print ontbreekt, start FiveM nog de oude map.
+Zoek dan op de hele server naar een tweede jg-anwb.

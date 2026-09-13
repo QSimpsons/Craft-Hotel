@@ -124,3 +124,54 @@ SetJobVehicleFuel = function(vehicle, amount)
 
     return true
 end
+
+BindAnwbLocationActions = function()
+    if type(Config) ~= 'table' or type(Config.Locations) ~= 'table' then
+        return false
+    end
+
+    local map = {
+        OpenGarage = OpenGarage,
+        DeleteVehicle = DeleteVehicle,
+        CloakroomMenu = CloakroomMenu,
+        OnOffDuty = OnOffDuty,
+        GetGear = GetGear,
+        OpenManagement = OpenManagement,
+        ManagementMenu = OpenManagement,
+        ['Garage'] = OpenGarage,
+        ['Voertuig wegzetten'] = DeleteVehicle,
+        ['Omkleden'] = CloakroomMenu,
+        ['In-/uitklokken'] = OnOffDuty,
+        ['Werkspullen pakken'] = GetGear,
+        ['Baas acties'] = OpenManagement,
+    }
+
+    local bound = 0
+    for _, loc in pairs(Config.Locations) do
+        local fn = loc.functionDefine
+        if type(fn) == 'string' then
+            fn = map[fn] or rawget(_G, fn)
+        end
+        if type(fn) ~= 'function' then
+            fn = map[loc.drawText]
+        end
+        if type(fn) == 'function' then
+            loc.functionDefine = fn
+            bound = bound + 1
+        end
+    end
+
+    return bound > 0
+end
+
+CreateThread(function()
+    print('^2[jg-anwb] keys.lua v3: locatie-acties worden gekoppeld^7')
+    for _ = 1, 100 do
+        if type(OpenGarage) == 'function' and BindAnwbLocationActions() then
+            print('^2[jg-anwb] Garage/omkleden/duty acties gekoppeld^7')
+            return
+        end
+        Wait(100)
+    end
+    print('^1[jg-anwb] Kon locatie-acties niet koppelen. Vervang de hele map jg-anwb.^7')
+end)

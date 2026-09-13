@@ -1,3 +1,5 @@
+print('^2[jg-anwb] client.lua v3 geladen (functionDefine-fix)^7')
+
 ESX = nil
 
 Citizen.CreateThread(function()
@@ -154,6 +156,9 @@ Citizen.CreateThread(function()
 	end
     
     while true do
+		if type(BindAnwbLocationActions) == 'function' then
+			BindAnwbLocationActions()
+		end
 		local sleep = 500
 		if IsPlayerOnDuty() then
 			local playerPed = PlayerPedId()
