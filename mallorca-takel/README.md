@@ -11,6 +11,7 @@ Volledig custom FiveM-takelscript voor **ESX Legacy 1.15**. Zelf geschreven: tak
 ```cfg
 ensure oxmysql
 ensure es_extended
+ensure ox_target
 ensure mallorca-takel
 ```
 
@@ -26,9 +27,10 @@ UPDATE users SET job = 'takel', job_grade = 3 WHERE identifier = 'jouw-identifie
 
 | Actie | Hoe |
 |--------|-----|
-| Tablet | **F1** of `/takel` |
-| Takelen / loskoppelen | **O** |
-| Pechhulp vragen | `/takelhulp motor doet het niet` |
+| Tablet | **F1**, `/takel` of oogje op het depot |
+| Takelen / loskoppelen | **Oogje** op het voertuig, of **O** |
+| Takelwagen pakken | Oogje op de wagens bij het depot |
+| Pechhulp vragen | Oogje op je auto, of `/takelhulp` |
 | Depot | Marker bij Mallorca Takel, **E** |
 | Inbeslagname | Met voertuig op de haak naar de rode marker, **E** |
 | Ophalen | Gouden marker bij de pound, **E** |
@@ -37,7 +39,8 @@ Toetsen aanpassen: FiveM → Settings → Key Bindings → FiveM.
 
 ## Wat zit erin
 
-- Haak (`towtruck` / `towtruck2`) en flatbed (`flatbed` / `slamtruck`)
+- Haak (`towtruck` / `towtruck2`) en flatbed (`flatbed` / `slamtruck`) staan bij het depot
+- Oogje (ox_target / qb-target / qtarget): voertuig aankijken en takelen
 - Dienst aan/uit
 - SQL-inbeslagname (`mallorca_impound`)
 - Spelersoproepen + optionele NPC-pechhulp

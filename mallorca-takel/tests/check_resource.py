@@ -12,6 +12,7 @@ required = [
     'config.lua',
     'client/main.lua',
     'client/tow.lua',
+    'client/target.lua',
     'server/main.lua',
     'sql/install.sql',
     'html/index.html',
@@ -30,7 +31,7 @@ for needle in ('jobs', 'job_grades', 'mallorca_impound', 'mallorca_takel_calls',
         errors.append(f'sql missing {needle}')
 
 manifest = (ROOT / 'fxmanifest.lua').read_text(encoding='utf-8')
-for needle in ("ui_page 'html/index.html'", 'client/tow.lua', 'server/main.lua', 'config.lua'):
+for needle in ("ui_page 'html/index.html'", 'client/tow.lua', 'client/target.lua', 'server/main.lua', 'config.lua'):
     if needle not in manifest:
         errors.append(f'manifest missing {needle}')
 

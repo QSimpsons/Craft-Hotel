@@ -15,6 +15,13 @@ Config.Keys = {
     toggle = 'O' -- takelen / loskoppelen
 }
 
+-- Oogje: ox_target / qb-target / qtarget (voertuig aankijken om te takelen)
+Config.UseTarget = true
+Config.TargetDistance = 2.5
+
+-- Zet echte takelwagens neer bij het depot
+Config.PlaceVehicles = true
+
 Config.Command = 'takel'
 Config.CallCommand = 'takelhulp'
 
@@ -93,6 +100,14 @@ Config.GarageVehicles = {
     { model = 'slamtruck', label = 'Slamtruck', minGrade = 2 }
 }
 
+-- Wagens die fysiek bij het depot staan (oogje: Takelwagen pakken)
+Config.ParkedVehicles = {
+    { model = 'flatbed', label = 'Flatbed', plate = 'TAKEL1', coords = vector4(476.68, -1317.52, 29.21, 305.0) },
+    { model = 'towtruck', label = 'Takelwagen', plate = 'TAKEL2', coords = vector4(474.12, -1309.88, 29.21, 305.0) },
+    { model = 'towtruck2', label = 'Takelwagen Tow', plate = 'TAKEL3', coords = vector4(487.55, -1332.40, 29.21, 300.0) },
+    { model = 'slamtruck', label = 'Slamtruck', plate = 'TAKEL4', coords = vector4(491.90, -1338.15, 29.21, 298.0) }
+}
+
 -- NPC-proefritten / pechhulp-oproepen (zet op false om alleen spelersoproepen te gebruiken)
 Config.NpcCalls = {
     enabled = true,
@@ -141,5 +156,14 @@ Config.Locale = {
     spawn_blocked = 'Spawnplek is geblokkeerd.',
     released = 'Voertuig vrijgegeven.',
     no_vehicle = 'Geen voertuig gevonden.',
-    occupied = 'Laat inzittenden eerst uitstappen.'
+    occupied = 'Laat inzittenden eerst uitstappen.',
+    too_far_truck = 'Zet je takelwagen dichter bij dit voertuig.',
+    parked_ready = 'Takelwagens staan klaar bij het depot.',
+    truck_taken = 'Je pakt de takelwagen. Klaar om te takelen.',
+    eye_tow = 'Voertuig takelen',
+    eye_detach = 'Loskoppelen',
+    eye_call = 'Takelhulp vragen',
+    eye_take_truck = 'Takelwagen pakken',
+    eye_tablet = 'Takel tablet',
+    eye_impound = 'Inbeslag nemen'
 }

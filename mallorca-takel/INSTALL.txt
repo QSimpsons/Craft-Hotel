@@ -7,6 +7,7 @@ Mallorca Takel — installatie
 
    ensure oxmysql
    ensure es_extended
+   ensure ox_target
    ensure mallorca-takel
 
 4. Zet een speler op job takel (grade 0–3).
@@ -15,7 +16,9 @@ Mallorca Takel — installatie
 In-game
 -------
 F1  = tablet
-O   = takelen / loskoppelen
+O   = takelen / loskoppelen (of oogje op het voertuig)
+Oogje op auto = Voertuig takelen / Takelhulp vragen
+Oogje op takelwagen bij depot = Takelwagen pakken
 /takelhulp [tekst] = pechhulp oproepen
 E bij depot / inbeslagname / ophaalmarker
 

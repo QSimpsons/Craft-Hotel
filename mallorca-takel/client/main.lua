@@ -6,6 +6,7 @@ local callBlip
 local depotBlip
 local impoundBlip
 local garageTruck = 0
+local parkedVehicles = {}
 
 local function notify(key, extra)
     local text = Config.Locale[key] or key
@@ -269,13 +270,13 @@ RegisterNetEvent('mallorca-takel:client:releaseVehicle', function(record)
     notify('paid')
 end)
 
-local function doAttach()
+local function doAttach(specificTarget)
     local ok, reason = canWork()
     if not ok then
         notify(reason)
         return
     end
-    local success, msg = Tow.Attach()
+    local success, msg = Tow.Attach(specificTarget)
     notify(msg)
     refreshNui()
     if success then
@@ -283,13 +284,114 @@ local function doAttach()
     end
 end
 
-local function doDetach()
-    local success, msg = Tow.Detach(true)
-    notify(msg)
-    refreshNui()
-    if success then
-        TriggerServerEvent('mallorca-takel:server:towing', nil)
+local function takeParkedTruck(entity)
+    local ok, reason = canWork()
+    if not ok then
+        notify(reason)
+        return
     end
+    if entity == 0 or not DoesEntityExist(entity) or not Tow.IsTowVehicle(entity) then
+        notify('no_truck')
+        return
+    end
+    Tow.EnsureControl(entity)
+    FreezeEntityPosition(entity, false)
+    SetVehicleDoorsLocked(entity, 1)
+    SetVehicleUndriveable(entity, false)
+    SetPedIntoVehicle(PlayerPedId(), entity, -1)
+    garageTruck = entity
+    if Entity(entity).state then
+        Entity(entity).state:set('mallorcaTakelParked', false, true)
+    end
+    notify('truck_taken')
+end
+
+local function spawnParkedVehicles()
+    if not Config.PlaceVehicles or not Config.ParkedVehicles then
+        return
+    end
+
+    local created = 0
+    for i = 1, #Config.ParkedVehicles do
+        local slot = Config.ParkedVehicles[i]
+        local c = slot.coords
+        local existing = GetClosestVehicle(c.x, c.y, c.z, 2.8, 0, 71)
+        if existing ~= 0 and #(GetEntityCoords(existing) - vector3(c.x, c.y, c.z)) < 2.8 then
+            parkedVehicles[#parkedVehicles + 1] = existing
+        else
+            local hash = joaat(slot.model)
+            RequestModel(hash)
+            local timeout = GetGameTimer() + 4000
+            while not HasModelLoaded(hash) and GetGameTimer() < timeout do
+                Wait(10)
+            end
+            if HasModelLoaded(hash) then
+                local veh = CreateVehicle(hash, c.x, c.y, c.z, c.w, true, true)
+                SetVehicleOnGroundProperly(veh)
+                SetVehicleNumberPlateText(veh, slot.plate or ('TAKEL' .. i))
+                SetVehicleDoorsLocked(veh, 2)
+                SetEntityAsMissionEntity(veh, true, true)
+                SetVehicleHasBeenOwnedByPlayer(veh, true)
+                FreezeEntityPosition(veh, true)
+                if Entity(veh).state then
+                    Entity(veh).state:set('mallorcaTakelParked', true, true)
+                end
+                parkedVehicles[#parkedVehicles + 1] = veh
+                created = created + 1
+                SetModelAsNoLongerNeeded(hash)
+            end
+        end
+    end
+    if created > 0 and isEmployee() then
+        notify('parked_ready')
+    end
+end
+
+AddEventHandler('mallorca-takel:internal:eyeTow', function(entity)
+    doAttach(entity)
+end)
+
+AddEventHandler('mallorca-takel:internal:eyeDetach', function()
+    doDetach()
+end)
+
+AddEventHandler('mallorca-takel:internal:eyeImpound', function()
+    doImpound()
+end)
+
+AddEventHandler('mallorca-takel:internal:eyeCall', function(entity)
+    local coords = GetEntityCoords(PlayerPedId())
+    if entity and entity ~= 0 and DoesEntityExist(entity) then
+        coords = GetEntityCoords(entity)
+    end
+    TriggerServerEvent('mallorca-takel:server:createCall', {
+        x = coords.x, y = coords.y, z = coords.z,
+        message = 'Takelhulp via oogje'
+    })
+end)
+
+AddEventHandler('mallorca-takel:internal:eyeTakeTruck', function(entity)
+    takeParkedTruck(entity)
+end)
+
+AddEventHandler('mallorca-takel:internal:eyeTablet', function()
+    if isEmployee() then
+        openNui({ page = 'garage' })
+    else
+        notify('not_employee')
+    end
+end)
+
+function MallorcaTakelIsEmployee()
+    return isEmployee()
+end
+
+function MallorcaTakelCanWork()
+    return canWork()
+end
+
+function MallorcaTakelOnDuty()
+    return onDuty
 end
 
 local function doImpound()
@@ -530,6 +632,11 @@ CreateThread(function()
     BeginTextCommandSetBlipName('STRING')
     AddTextComponentSubstringPlayerName(Config.Impound.label)
     EndTextCommandSetBlipName(impoundBlip)
+
+    CreateThread(function()
+        Wait(2000)
+        spawnParkedVehicles()
+    end)
 end)
 
 CreateThread(function()
@@ -625,4 +732,11 @@ AddEventHandler('onResourceStop', function(res)
     clearCallBlip()
     if depotBlip then RemoveBlip(depotBlip) end
     if impoundBlip then RemoveBlip(impoundBlip) end
+    for i = 1, #parkedVehicles do
+        local veh = parkedVehicles[i]
+        if veh and DoesEntityExist(veh) then
+            SetEntityAsMissionEntity(veh, true, true)
+            DeleteVehicle(veh)
+        end
+    end
 end)

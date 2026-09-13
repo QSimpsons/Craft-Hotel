@@ -30,7 +30,7 @@ function Tow.EnsureControl(entity)
     if NetworkHasControlOfEntity(entity) then
         return true
     end
-    local timeout = GetGameTimer() + 1500
+    local timeout = GetGameTimer() + 2500
     NetworkRequestControlOfEntity(entity)
     while not NetworkHasControlOfEntity(entity) and GetGameTimer() < timeout do
         NetworkRequestControlOfEntity(entity)
@@ -83,15 +83,16 @@ local function closestFromPoint(point, maxDist, ignore)
     return closest, dist
 end
 
-function Tow.FindTruck(ped)
+function Tow.FindTruck(ped, maxDist)
     local veh = GetVehiclePedIsIn(ped, false)
     if veh ~= 0 and Tow.IsTowVehicle(veh) then
         return veh
     end
 
+    maxDist = maxDist or 6.0
     local coords = GetEntityCoords(ped)
     local vehicles = GetGamePool('CVehicle')
-    local closest, dist = 0, 6.0
+    local closest, dist = 0, maxDist
     for i = 1, #vehicles do
         local v = vehicles[i]
         if Tow.IsTowVehicle(v) then
@@ -123,14 +124,47 @@ function Tow.FindTarget(tow)
     return target
 end
 
+local function prepareEntity(entity)
+    SetEntityAsMissionEntity(entity, true, true)
+    SetVehicleHasBeenOwnedByPlayer(entity, true)
+    if not NetworkGetEntityIsNetworked(entity) then
+        NetworkRegisterEntityAsNetworked(entity)
+    end
+end
+
 local function attachHook(tow, target)
+    prepareEntity(target)
+    prepareEntity(tow)
+    local front = GetOffsetFromEntityInWorldCoords(tow, 0.0, 7.2, 0.15)
+    SetEntityCoords(target, front.x, front.y, front.z, false, false, false, false)
+    SetEntityHeading(target, GetEntityHeading(tow))
+    Wait(120)
+    SetVehicleOnGroundProperly(target)
     SetVehicleTowTruckArmPosition(tow, 1.0)
-    Wait(250)
+    Wait(350)
+    AttachVehicleToTowTruck(tow, target, false, 0.0, 0.0, 0.0)
+    Wait(200)
+    if IsVehicleAttachedToTowTruck(tow, target) then
+        return true
+    end
     AttachVehicleToTowTruck(tow, target, true, 0.0, 0.0, 0.0)
-    return IsVehicleAttachedToTowTruck(tow, target)
+    Wait(150)
+    if IsVehicleAttachedToTowTruck(tow, target) then
+        return true
+    end
+    local bone = GetEntityBoneIndexByName(tow, 'bodyshell')
+    if bone == -1 then bone = 0 end
+    AttachEntityToEntity(target, tow, bone, 0.0, 4.0, 0.25, 0.0, 0.0, 0.0, false, false, false, false, 2, true)
+    return IsEntityAttachedToEntity(target, tow)
 end
 
 local function attachFlatbed(tow, target, cfg)
+    prepareEntity(target)
+    prepareEntity(tow)
+    local rear = GetOffsetFromEntityInWorldCoords(tow, 0.0, -6.5, 0.4)
+    SetEntityCoords(target, rear.x, rear.y, rear.z, false, false, false, false)
+    SetEntityHeading(target, GetEntityHeading(tow))
+    Wait(120)
     local bone = GetEntityBoneIndexByName(tow, cfg.bone or 'bodyshell')
     if bone == -1 then bone = 0 end
     local off = cfg.offset or vector3(0.0, -2.0, 1.0)
@@ -139,27 +173,39 @@ local function attachFlatbed(tow, target, cfg)
         target, tow, bone,
         off.x, off.y, off.z,
         rot.x, rot.y, rot.z,
-        false, false, true, false, 2, true
+        false, false, false, false, 2, true
     )
+    Wait(80)
     return IsEntityAttachedToEntity(target, tow)
 end
 
-function Tow.Attach()
+function Tow.Attach(specificTarget)
     local ped = PlayerPedId()
     local current = Tow.GetAttached()
     if current ~= 0 then
         return false, 'already_towing'
     end
 
-    local tow = Tow.FindTruck(ped)
+    local searchDist = specificTarget and 14.0 or 8.0
+    local tow = Tow.FindTruck(ped, searchDist)
     if tow == 0 then
         return false, 'no_truck'
     end
 
     local cfg = modelConfig(tow)
-    local target = Tow.FindTarget(tow)
-    if target == 0 then
+    local target = specificTarget
+    if not target or target == 0 or not DoesEntityExist(target) then
+        target = Tow.FindTarget(tow)
+    end
+    if target == 0 or target == tow then
         return false, 'no_target'
+    end
+    if Tow.IsTowVehicle(target) then
+        return false, 'class_blocked'
+    end
+
+    if #(GetEntityCoords(tow) - GetEntityCoords(target)) > 16.0 then
+        return false, 'too_far_truck'
     end
 
     if not Tow.IsClassAllowed(target) then
