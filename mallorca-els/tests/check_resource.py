@@ -72,8 +72,10 @@ if 'forceAllExtras' not in lua:
     errors.append('client missing forceAllExtras')
 if 'SetVehicleLights(veh, flash and 2' in lua or 'SetVehicleLights(veh, 2)' in lua:
     errors.append('ELS must not flash or force headlights')
-if 'HeadlightWigwag = true' in (ROOT / 'config.lua').read_text(encoding='utf-8'):
-    errors.append('HeadlightWigwag must stay off')
+if 'SetVehicleIndicatorLights(veh, 0, true)' in lua or 'SetVehicleIndicatorLights(veh, 1, true)' in lua:
+    errors.append('ELS must not turn the four indicators on')
+if 'clearIndicators' not in lua:
+    errors.append('client missing clearIndicators')
 
 server = (ROOT / 'server/main.lua').read_text(encoding='utf-8')
 for needle in ('mallorca-els:update', 'mallorca-els:apply', 'fmltow', 'dlbrickade', 'scene'):

@@ -148,9 +148,9 @@ local function restoreExtras(veh, saved)
     end
 end
 
-local function setHazards(veh, on)
-    SetVehicleIndicatorLights(veh, 0, on)
-    SetVehicleIndicatorLights(veh, 1, on)
+local function clearIndicators(veh)
+    SetVehicleIndicatorLights(veh, 0, false)
+    SetVehicleIndicatorLights(veh, 1, false)
 end
 
 local function allExtras(veh, list, on)
@@ -254,7 +254,7 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
 
     if sceneOn then
         forceAllExtras(veh, true)
-        setHazards(veh, true)
+        clearIndicators(veh)
         muteSiren(veh, false)
         return
     end
@@ -262,14 +262,14 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
     if st <= 0 then
         restoreExtras(veh, saved)
         forceAllExtras(veh, false)
-        setHazards(veh, false)
+        clearIndicators(veh)
         muteSiren(veh, false)
         return
     end
 
-    -- Koplampen nooit overrulen: speler houdt eigen lichtstand
+    -- Koplampen en pinkers nooit meenemen
     SetVehicleLights(veh, 0)
-    setHazards(veh, false)
+    clearIndicators(veh)
 
     if st == 1 then
         forceAllExtras(veh, false)
@@ -279,8 +279,6 @@ local function applyPattern(veh, st, meta, isOwner, flash, sceneOn, sweepAt)
     end
 
     local beat = math.floor(tonumber(flash) or 0)
-    SetVehicleIndicatorLights(veh, 0, (beat % 2) == 0)
-    SetVehicleIndicatorLights(veh, 1, (beat % 2) == 1)
     alternateSides(veh, list, left, right, beat)
     muteSiren(veh, true)
 end

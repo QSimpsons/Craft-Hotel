@@ -37,8 +37,8 @@ Config.FlashMs = {
     [3] = 80
 }
 
--- Noodknippers alleen op zwaai (2), niet op vol
-Config.UseHazardsFromStage = 2
+-- Pinkers (4 knipperlichten) doen NOOIT mee met ELS
+Config.UseIndicators = false
 
 -- Koplampen nooit meenemen met ELS
 Config.HeadlightWigwag = false

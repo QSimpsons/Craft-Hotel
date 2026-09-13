@@ -12,5 +12,5 @@ Alleen als bestuurder in die wagen:
 0 = uit
 R = werklicht
 
-Geen sirene.
+Geen sirene. Geen pinkers (4 knipperlichten).
 Te voet: geen ELS. Uitstappen: alles uit.
