@@ -1,0 +1,26 @@
+JG-CARKEYS FIX (giveCarKeys export)
+===================================
+
+Jouw error:
+  SCRIPT ERROR: @jg-anwb/client/client.lua:283: No such export giveCarKeys in resource jg-carkeys
+
+jg-anwb roept exports['jg-carkeys']:giveCarKeys aan, maar jg-carkeys heeft die export niet.
+
+DOE DIT (kies 1 van de 2):
+
+A) SNELST: zet de export in je bestaande jg-carkeys
+   1. Kopieer giveCarKeys.lua naar je jg-carkeys map
+      (resources/jg-carkeys/giveCarKeys.lua OF resources/jg-carkeys/client/giveCarKeys.lua)
+   2. Open jg-carkeys/fxmanifest.lua
+   3. Bij client_scripts, voeg toe:
+        'giveCarKeys.lua',
+      of als het bestand in de client-map staat:
+        'client/giveCarKeys.lua',
+   4. In F8 / server console:
+        ensure jg-carkeys
+        ensure jg-anwb
+
+B) Vervang jg-anwb/client/client.lua met het bestand uit de map jg-anwb
+   (de nieuwe client.lua crasht niet meer, ook zonder deze export)
+
+Daarna een voertuig uit de ANWB-garage pakken. De error moet weg zijn.

@@ -24,6 +24,59 @@ AddEventHandler('esx:setJob', function(Job)
 	ESX.SetPlayerData('job', Job)
 end)
 
+-- Nooit crashen als giveCarKeys ontbreekt in jg-carkeys / andere key-resources.
+SafeGiveCarKeys = function(vehicle, plate, props)
+	if vehicle and vehicle ~= 0 then
+		plate = plate or GetVehicleNumberPlateText(vehicle)
+		if (not props or type(props) ~= 'table') and ESX and ESX.Game then
+			props = ESX.Game.GetVehicleProperties(vehicle)
+		end
+	end
+
+	local function tryExport(resource, method)
+		if type(resource) ~= 'string' or resource == '' then
+			return false
+		end
+		if GetResourceState(resource) ~= 'started' then
+			return false
+		end
+		local ok = pcall(function()
+			exports[resource][method](plate, props, vehicle)
+		end)
+		return ok
+	end
+
+	if tryExport('jg-givekey', 'giveCarKeys') then return true end
+	if Config and tryExport(Config.Carkeys, 'giveCarKeys') then return true end
+	if tryExport('jg-carkeys', 'giveCarKeys') then return true end
+	if tryExport('jg-givekey', 'GiveKeys') then return true end
+	if Config and tryExport(Config.Carkeys, 'GiveKeys') then return true end
+	if tryExport('qs-vehiclekeys', 'GiveKeys') then return true end
+	if tryExport('wasabi_carlock', 'GiveKey') then return true end
+
+	pcall(function()
+		TriggerEvent('jg-givekey:client:giveCarKeys', plate, props, vehicle)
+		TriggerEvent('jg-carkeys:client:giveKeys', plate, props, vehicle)
+		TriggerEvent('vehiclekeys:client:SetOwner', plate)
+		TriggerEvent('cd_garage:AddKeys', plate)
+	end)
+	return false
+end
+
+SafeSetFuel = function(vehicle, amount)
+	amount = amount or 100.0
+	if Config and Config.Benzine then
+		local ok = pcall(function()
+			exports[Config.Benzine]:setFuel(vehicle, amount)
+		end)
+		if ok then return true end
+	end
+	pcall(function()
+		SetVehicleFuelLevel(vehicle, amount + 0.0)
+	end)
+	return true
+end
+
 DrawBlips = function()
 	for i=1, #Config.Blips, 1 do
 		local v = Config.Blips[i]
@@ -281,9 +334,19 @@ AddEventHandler('jg-anwb:client:spawn:vehicle', function(data)
 			ESX.Game.SpawnVehicle(vehicle, vector3(garage.spawnPoints[i].x, garage.spawnPoints[i].y, garage.spawnPoints[i].z), garage.spawnPoints[i].w, function(veh)
 				TaskWarpPedIntoVehicle(PlayerPedId(), veh, -1)
 				SetVehicleNumberPlateText(veh, props.plate)
+				local plate = GetVehicleNumberPlateText(veh)
 				local vehicleProps = ESX.Game.GetVehicleProperties(veh)
-				GiveJobVehicleKeys(veh, GetVehicleNumberPlateText(veh), vehicleProps)
-				SetJobVehicleFuel(veh, 100.0)
+				-- pcall: oude jg-carkeys heeft geen giveCarKeys export
+				if type(GiveJobVehicleKeys) == 'function' then
+					GiveJobVehicleKeys(veh, plate, vehicleProps)
+				else
+					SafeGiveCarKeys(veh, plate, vehicleProps)
+				end
+				if type(SetJobVehicleFuel) == 'function' then
+					SetJobVehicleFuel(veh, 100.0)
+				else
+					SafeSetFuel(veh, 100.0)
+				end
 			end, true, props)
 			foundPoint = true 
 			break

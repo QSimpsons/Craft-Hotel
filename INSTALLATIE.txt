@@ -1,0 +1,28 @@
+JG-ANWB GIVEKEYS FIX
+====================
+
+Error:
+  @jg-anwb/client/client.lua:283: No such export giveCarKeys in resource jg-carkeys
+
+Je draait nog de OUDE jg-anwb. Alleen jg-givekey starten is niet genoeg.
+
+VERPLICHT (doe allebei als het kan):
+
+1. Vervang op je FiveM server dit bestand:
+     resources/.../jg-anwb/client/client.lua
+   door het client.lua uit deze zip (map jg-anwb/client/).
+
+   OF kopieer de hele map jg-anwb over je oude jg-anwb heen.
+
+2. Zet ZET-IN-JG-CARKEYS/giveCarKeys.lua in je bestaande jg-carkeys
+   en voeg het toe in jg-carkeys/fxmanifest.lua bij client_scripts.
+
+3. server.cfg:
+     ensure jg-givekey
+     ensure jg-carkeys
+     ensure jg-anwb
+
+4. Restart of:
+     ensure jg-givekey
+     ensure jg-carkeys
+     ensure jg-anwb
