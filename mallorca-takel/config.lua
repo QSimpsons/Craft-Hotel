@@ -43,8 +43,8 @@ Config.TargetDistance = 12.0
 -- Zet extra wagens neer bij ons depot (false = alleen jouw eigen takelwagens)
 Config.PlaceVehicles = false
 
--- Zit je in een utility/commercial wagen als mechanic? Dan is dat je takelwagen.
-Config.AllowCurrentVehicle = true
+-- Alleen jouw addons zijn takelwagens (geen GTA flatbed/towtruck)
+Config.AllowCurrentVehicle = false
 
 -- Extra spawncodes van jouw eigen takelwagens (addons)
 Config.ExtraTowModels = {
@@ -115,7 +115,7 @@ Config.AllowedClasses = {
     [10] = true, [11] = true, [12] = true, [17] = true, [18] = true, [20] = true
 }
 
--- Takelwagens: hook = GTA-haak (alleen towtruck), flatbed = laadbak (ook addons)
+-- Alleen fmltow en dlbrickade
 Config.TowVehicles = {
     [`fmltow`] = {
         type = 'flatbed',
@@ -143,28 +143,6 @@ Config.TowVehicles = {
             vector3(0.0, -3.20, 1.05),
             vector3(0.0, -5.00, 1.40)
         }
-    },
-    [`towtruck`] = {
-        type = 'hook',
-        label = 'Takelwagen'
-    },
-    [`towtruck2`] = {
-        type = 'hook',
-        label = 'Takelwagen Tow'
-    },
-    [`flatbed`] = {
-        type = 'flatbed',
-        label = 'Flatbed',
-        bone = 'bodyshell',
-        offset = vector3(0.0, -2.2, 1.05),
-        rotation = vector3(0.0, 0.0, 0.0)
-    },
-    [`slamtruck`] = {
-        type = 'flatbed',
-        label = 'Slamtruck',
-        bone = 'bodyshell',
-        offset = vector3(0.0, -1.15, 0.55),
-        rotation = vector3(0.0, 0.0, 0.0)
     }
 }
 
@@ -189,9 +167,7 @@ Config.Impound = {
 
 Config.GarageVehicles = {
     { model = 'fmltow', label = 'FML Tow', minGrade = 1 },
-    { model = 'dlbrickade', label = 'DL Brickade', minGrade = 1 },
-    { model = 'flatbed', label = 'Flatbed', minGrade = 0 },
-    { model = 'towtruck', label = 'Takelwagen', minGrade = 0 }
+    { model = 'dlbrickade', label = 'DL Brickade', minGrade = 1 }
 }
 
 -- Wagens die fysiek bij het depot staan (oogje: Takelwagen pakken)

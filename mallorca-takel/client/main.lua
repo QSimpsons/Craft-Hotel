@@ -558,7 +558,7 @@ RegisterNUICallback('impound', function(_, cb)
 end)
 
 RegisterNUICallback('spawnTruck', function(data, cb)
-    spawnTruck(data and data.model or 'flatbed')
+    spawnTruck(data and data.model or 'fmltow')
     cb({ ok = true })
 end)
 

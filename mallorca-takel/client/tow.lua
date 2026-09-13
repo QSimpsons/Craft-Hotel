@@ -4,10 +4,7 @@ local attachedVehicle = 0
 local attachedTow = 0
 local attachedType = nil
 local extraHashes
-local hookModels = {
-    [`towtruck`] = true,
-    [`towtruck2`] = true,
-}
+local hookModels = {}
 
 local function extraModelSet()
     if extraHashes then
@@ -70,10 +67,7 @@ function Tow.GetProfile(vehicle)
     if name == 'dlbrickade' or name:find('brickade', 1, true) then
         return Config.TowVehicles[`dlbrickade`] or defaultFlatbed()
     end
-    if name == 'towtruck' or name == 'towtruck2' then
-        return defaultHook()
-    end
-    if name:find('flat', 1, true) or name:find('slam', 1, true) or name:find('takel', 1, true) then
+    if name:find('fml', 1, true) or name:find('dlbrick', 1, true) then
         return defaultFlatbed()
     end
 

@@ -1,7 +1,7 @@
 (() => {
   const titles = {
     home: ['Overzicht', 'Depot · inbeslagname · pechhulp'],
-    tow: ['Takelen', 'Haak of flatbed — O om vast te maken'],
+    tow: ['Takelen', 'fmltow of dlbrickade — O om vast te maken'],
     impound: ['Inbeslagname', 'Kentekens, reden en vrijgave'],
     calls: ['Oproepen', 'Spelers en NPC-pechhulp'],
     bill: ['Factuur', 'Stuur een rekening naar iemand in de buurt'],
@@ -143,7 +143,7 @@
     el.statImpound.textContent = String((state.impounds || []).length);
     el.homeLoad.textContent = vehicleLine(state.attached, 'Nog geen voertuig vastgemaakt. Gebruik O of de tab Takelen.');
     el.towTruck.textContent = vehicleLine(state.truck, 'Geen takelwagen in de buurt.');
-    el.towTarget.textContent = vehicleLine(state.target, 'Ga achter (flatbed) of voor (haak) een voertuig staan.');
+    el.towTarget.textContent = vehicleLine(state.target, 'Zet de auto achter de fmltow of dlbrickade.');
     el.towAttached.textContent = vehicleLine(state.attached, 'Leeg');
     renderImpound();
     renderCalls();
@@ -155,10 +155,8 @@
     Object.assign(state, data);
     if (!state.garage || !state.garage.length) {
       state.garage = data.garage || [
-        { model: 'flatbed', label: 'Flatbed' },
-        { model: 'towtruck', label: 'Takelwagen' },
-        { model: 'towtruck2', label: 'Takelwagen Tow' },
-        { model: 'slamtruck', label: 'Slamtruck' },
+        { model: 'fmltow', label: 'FML Tow' },
+        { model: 'dlbrickade', label: 'DL Brickade' },
       ];
     }
     render();
@@ -240,10 +238,8 @@
       duty: state.duty,
       employee: true,
       garage: [
-        { model: 'flatbed', label: 'Flatbed' },
-        { model: 'towtruck', label: 'Takelwagen' },
-        { model: 'towtruck2', label: 'Takelwagen Tow' },
-        { model: 'slamtruck', label: 'Slamtruck' },
+        { model: 'fmltow', label: 'FML Tow' },
+        { model: 'dlbrickade', label: 'DL Brickade' },
       ],
       truck: state.truck,
       attached: state.attached,
@@ -291,7 +287,7 @@
   if (!isNui) {
     document.body.classList.add('demo-mode');
     el.demo.classList.remove('hidden');
-    state.truck = { plate: 'TAKEL', model: 'FLATBED', engine: 100, body: 100 };
+    state.truck = { plate: 'FMLTOW', model: 'FMLTOW', engine: 100, body: 100 };
     state.target = { plate: 'MAL 482', model: 'SULTAN', engine: 18, body: 24 };
     state.calls = [
       { id: 1, callerName: 'Sara', kind: 'player', message: 'Motor doet het niet', status: 'open' },
