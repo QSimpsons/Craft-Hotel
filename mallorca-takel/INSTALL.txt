@@ -1,0 +1,26 @@
+Mallorca Takel — installatie
+============================
+
+1. Zet de map mallorca-takel in resources.
+2. Voer sql/install.sql uit in je ESX-database.
+3. In server.cfg, na es_extended:
+
+   ensure oxmysql
+   ensure es_extended
+   ensure ox_target
+   ensure mallorca-takel
+
+4. Job mechanic / Wegenwacht rang 1 t/m 6 (6 = Manager).
+5. restart mallorca-takel
+
+In-game
+-------
+F1  = tablet
+O   = takelen / loskoppelen (in fmltow of dlbrickade)
+Oogje op auto = Voertuig takelen
+Oogje op takelwagen bij depot = Takelwagen pakken
+/takelhulp [tekst] = pechhulp oproepen
+E bij depot / inbeslagname / ophaalmarker
+
+Zonder oxmysql werken takelen en de tablet nog; inbeslagname
+wordt dan niet in SQL bewaard.

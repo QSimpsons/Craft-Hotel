@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mallorca Takel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app" class="app" aria-hidden="true">
+    <section class="tablet" role="dialog" aria-label="Mallorca Takel tablet">
+      <div class="sunset-bar"></div>
+      <aside class="nav">
+        <div class="brand">
+          <div class="crest">MT</div>
+          <div>
+            <strong>Mallorca Takel</strong>
+            <span>Custom dispatch</span>
+          </div>
+        </div>
+        <nav>
+          <button type="button" data-page="home" class="active">Overzicht</button>
+          <button type="button" data-page="tow">Takelen</button>
+          <button type="button" data-page="impound">Inbeslagname</button>
+          <button type="button" data-page="calls">Oproepen</button>
+          <button type="button" data-page="bill">Factuur</button>
+          <button type="button" data-page="garage">Garage</button>
+        </nav>
+        <button type="button" id="btn-close" class="ghost">Sluiten</button>
+      </aside>
+      <main>
+        <header class="top">
+          <div>
+            <h1 id="page-title">Overzicht</h1>
+            <p id="page-sub">Depot · inbeslagname · pechhulp</p>
+          </div>
+          <button type="button" id="btn-duty" class="duty off">Uit dienst</button>
+        </header>
+
+        <section id="page-home" class="page visible">
+          <div class="stats">
+            <article><span>Dienst</span><strong id="stat-duty">Uit</strong></article>
+            <article><span>Op de haak</span><strong id="stat-hook">—</strong></article>
+            <article><span>Open oproepen</span><strong id="stat-calls">0</strong></article>
+            <article><span>Inbeslagname</span><strong id="stat-impound">0</strong></article>
+          </div>
+          <div class="grid-2">
+            <div class="card">
+              <h2>Huidige lading</h2>
+              <p id="home-load" class="muted">Nog geen voertuig vastgemaakt. Gebruik O of de tab Takelen.</p>
+            </div>
+            <div class="card">
+              <h2>Snelacties</h2>
+              <div class="actions">
+                <button type="button" data-page="tow">Takelen</button>
+                <button type="button" data-page="calls">Oproepen</button>
+                <button type="button" data-page="garage">Wagen pakken</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="page-tow" class="page">
+          <div class="grid-2">
+            <div class="card">
+              <h2>Takelwagen</h2>
+              <p id="tow-truck" class="muted">Geen takelwagen in de buurt.</p>
+              <div class="actions">
+                <button type="button" id="btn-attach" class="primary">Vastmaken</button>
+                <button type="button" id="btn-detach">Loskoppelen</button>
+              </div>
+            </div>
+            <div class="card">
+              <h2>Doelvoertuig</h2>
+              <p id="tow-target" class="muted">Zet de auto achter de fmltow of dlbrickade.</p>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Getakeld voertuig</h2>
+            <p id="tow-attached" class="muted">Leeg</p>
+            <button type="button" id="btn-impound" class="primary">Inbeslag nemen bij depot</button>
+          </div>
+        </section>
+
+        <section id="page-impound" class="page">
+          <div class="card">
+            <div class="row-head">
+              <h2>Voertuigen inbeslagname</h2>
+              <input id="impound-search" type="search" placeholder="Zoek op kenteken…" />
+            </div>
+            <div id="impound-list" class="list"></div>
+          </div>
+        </section>
+
+        <section id="page-calls" class="page">
+          <div class="card">
+            <div class="row-head">
+              <h2>Live oproepen</h2>
+              <button type="button" id="btn-refresh" class="ghost">Vernieuwen</button>
+            </div>
+            <div id="call-list" class="list"></div>
+          </div>
+        </section>
+
+        <section id="page-bill" class="page">
+          <div class="card">
+            <h2>Factuur sturen</h2>
+            <label>Speler in de buurt
+              <select id="bill-target"></select>
+            </label>
+            <label>Bedrag (€)
+              <input id="bill-amount" type="number" min="100" max="25000" value="850" />
+            </label>
+            <label>Reden
+              <input id="bill-reason" type="text" maxlength="80" value="Takeldienst Mallorca" />
+            </label>
+            <button type="button" id="btn-bill" class="primary">Factuur versturen</button>
+          </div>
+        </section>
+
+        <section id="page-garage" class="page">
+          <div class="card">
+            <h2>Takelwagens</h2>
+            <p class="muted">Alleen bij het depot. Spawnplek moet vrij zijn.</p>
+            <div id="garage-list" class="garage"></div>
+            <button type="button" id="btn-store">Huidige wagen wegzetten</button>
+          </div>
+        </section>
+      </main>
+    </section>
+  </div>
+
+  <div id="demo" class="demo hidden">
+    <h1>Mallorca Takel — demo</h1>
+    <p>Zelfde tablet als in-game. F1 opent dit menu, O takelt.</p>
+    <div class="demo-toggles">
+      <button type="button" id="demo-open">Tablet openen</button>
+      <button type="button" id="demo-call">Nieuwe oproep</button>
+      <button type="button" id="demo-attach">Voertuig vastmaken</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
