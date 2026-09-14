@@ -13,10 +13,7 @@ shared_scripts {
 }
 
 client_scripts {
-    'client/keys.lua',
-    'client/clothing.lua',
-    'client/client.lua',
-    'client/zzz_bind_actions.lua'
+    'client/*.lua'
 }
 
 server_scripts {
