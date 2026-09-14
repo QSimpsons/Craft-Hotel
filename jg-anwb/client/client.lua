@@ -1,4 +1,4 @@
-print('^2[jg-anwb] client.lua v5 geladen (kleedkamer in 1 file)^7')
+print('^2[jg-anwb] client.lua v6 geladen^7')
 
 ESX = nil
 
@@ -491,39 +491,65 @@ SafeOpenManagement = function()
 end
 
 OnOffDuty = function()
-	SafeToggleDuty()
+	if type(SafeToggleDuty) == 'function' then
+		SafeToggleDuty()
+	else
+		TriggerServerEvent('jg-anwb:server:toggleDuty')
+	end
 end
 
 OpenManagement = function()
-	SafeOpenManagement()
+	if type(SafeOpenManagement) == 'function' then
+		SafeOpenManagement()
+	else
+		pcall(function()
+			TriggerEvent('esx_society:openBossMenu', 'mechanic', function() end, { wash = false })
+		end)
+	end
 end
 
 RegisterNetEvent('jg-anwb:client:own:cloakroom')
 AddEventHandler('jg-anwb:client:own:cloakroom', function()
-	if ESX.PlayerData.job.name == 'mechanic' then
+	if not ESX.PlayerData or ESX.PlayerData.job.name ~= 'mechanic' then return end
+	if type(OpenSavedOutfitsMenu) == 'function' then
 		OpenSavedOutfitsMenu()
+		return
 	end
+	pcall(function()
+		exports[Config.Kleding]:openSavedOutfits()
+	end)
+	pcall(function()
+		exports['ox_appearance']:showOutfitMenu()
+	end)
+	TriggerEvent('esx_skin:openSaveableMenu')
 end)
 
 RegisterNetEvent('jg-anwb:client:anwb:cloakroom')
 AddEventHandler('jg-anwb:client:anwb:cloakroom', function()
-	if ESX.PlayerData.job.name == 'mechanic' then
+	if not ESX.PlayerData or ESX.PlayerData.job.name ~= 'mechanic' then return end
+	if type(OpenJobOutfitMenu) == 'function' then
 		OpenJobOutfitMenu(Config.Outfits)
+		return
 	end
+	SafeNotify('error', 'ANWB outfits konden niet geladen worden.', 4000)
 end)
 
 CloakroomMenu = function()
 	if ESX.PlayerData.job.name == 'mechanic' then
 		local options = {
-			[1] = {
-				['title'] = 'Persoonlijke kleedkamer',
-				['description'] = 'Bekijk je eigen outfits',
-				['event'] = 'jg-anwb:client:own:cloakroom'
+			{
+				title = 'Persoonlijke kleedkamer',
+				description = 'Bekijk je eigen outfits',
+				onSelect = function()
+					TriggerEvent('jg-anwb:client:own:cloakroom')
+				end
 			},
-			[2] = {
-				['title'] = 'Algemene kleedkamer',
-				['description'] = 'Bekijk de ANWB outfits',
-				['event'] = 'jg-anwb:client:anwb:cloakroom'
+			{
+				title = 'Algemene kleedkamer',
+				description = 'Bekijk de ANWB outfits',
+				onSelect = function()
+					TriggerEvent('jg-anwb:client:anwb:cloakroom')
+				end
 			},
 		}
 

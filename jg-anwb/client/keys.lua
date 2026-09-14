@@ -40,6 +40,108 @@ SafeNotify = function(nType, message, duration)
     return true
 end
 
+-- Fallback als a_helpers.lua niet in fxmanifest staat: keys.lua laadt vaak wél als eerste.
+if type(OpenSavedOutfitsMenu) ~= 'function' then
+    local function IsFemalePed(ped)
+        return GetEntityModel(ped) == `mp_f_freemode_01`
+    end
+
+    ApplyAnwbOutfit = function(outfit)
+        if type(outfit) ~= 'table' then return false end
+        local ped = PlayerPedId()
+        local genderData = IsFemalePed(ped) and (outfit.female or outfit.male) or (outfit.male or outfit.female)
+        if type(genderData) ~= 'table' then return false end
+        if type(genderData.components) == 'table' then
+            for _, comp in pairs(genderData.components) do
+                if type(comp) == 'table' and comp.component_id ~= nil then
+                    SetPedComponentVariation(ped, tonumber(comp.component_id) or 0, tonumber(comp.drawable) or 0, tonumber(comp.texture) or 0, 0)
+                end
+            end
+        end
+        if type(genderData.props) == 'table' then
+            for _, prop in pairs(genderData.props) do
+                if type(prop) == 'table' and prop.prop_id ~= nil then
+                    local propId = tonumber(prop.prop_id) or 0
+                    local drawable = tonumber(prop.drawable) or -1
+                    if drawable < 0 then
+                        ClearPedProp(ped, propId)
+                    else
+                        SetPedPropIndex(ped, propId, drawable, tonumber(prop.texture) or 0, true)
+                    end
+                end
+            end
+        end
+        return true
+    end
+
+    OpenSavedOutfitsMenu = function()
+        local clothing = (Config and Config.Kleding) or 'jg-clothingmenu'
+        local methods = { 'openSavedOutfits', 'OpenSavedOutfits', 'openOutfitMenu', 'OpenOutfitMenu', 'showOutfitMenu' }
+        for i = 1, #methods do
+            if SafeCallExport(clothing, methods[i]) then return true end
+        end
+        if SafeCallExport('ox_appearance', 'showOutfitMenu') then return true end
+        pcall(function()
+            TriggerEvent('ox_appearance:outfitMenu')
+            TriggerEvent('illenium-appearance:client:openOutfitMenu')
+            TriggerEvent('esx_skin:openSaveableMenu')
+        end)
+        SafeNotify('error', 'Geen persoonlijk kledingmenu gevonden.', 4000)
+        return false
+    end
+
+    OpenJobOutfitMenu = function(outfits)
+        outfits = outfits or (Config and Config.Outfits) or {}
+        if SafeCallExport(Config.Jobsmenu, 'OpenOutfitMenu', outfits) then return true end
+        local categories = {}
+        for categoryName, categoryOutfits in pairs(outfits) do
+            if type(categoryOutfits) == 'table' then
+                categories[#categories + 1] = {
+                    title = categoryName,
+                    arrow = true,
+                    onSelect = function()
+                        local options = {}
+                        for outfitName, outfitData in pairs(categoryOutfits) do
+                            options[#options + 1] = {
+                                title = outfitName,
+                                onSelect = function()
+                                    ApplyAnwbOutfit(outfitData)
+                                end
+                            }
+                        end
+                        lib.registerContext({
+                            id = 'anwb:job-outfits:' .. categoryName,
+                            title = categoryName,
+                            options = options
+                        })
+                        lib.showContext('anwb:job-outfits:' .. categoryName)
+                    end
+                }
+            end
+        end
+        if #categories == 0 then return false end
+        lib.registerContext({ id = 'anwb:job-outfits', title = 'ANWB outfits', options = categories })
+        lib.showContext('anwb:job-outfits')
+        return true
+    end
+
+    SafeToggleDuty = function()
+        local jobName = ESX and ESX.PlayerData and ESX.PlayerData.job and ESX.PlayerData.job.name
+        if SafeCallExport(Config.Jobsmenu, 'ToggleDuty', jobName) then return true end
+        TriggerServerEvent('jg-anwb:server:toggleDuty')
+        return true
+    end
+
+    SafeOpenManagement = function()
+        local jobName = ESX and ESX.PlayerData and ESX.PlayerData.job and ESX.PlayerData.job.name or 'mechanic'
+        if SafeCallExport(Config.Jobsmenu, 'OpenManagementMenu', jobName) then return true end
+        pcall(function()
+            TriggerEvent('esx_society:openBossMenu', 'mechanic', function() end, { wash = false })
+        end)
+        return true
+    end
+end
+
 GiveJobVehicleKeys = function(vehicle, plate, props)
     plate = Trim(plate)
 
