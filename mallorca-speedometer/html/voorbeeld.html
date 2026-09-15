@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Speedometer + tank demo</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .banner {
+      position: absolute; left: 50%; top: 2.5vh; transform: translateX(-50%);
+      padding: 1vh 2vh; border-radius: 999px; background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 1.5vh;
+      letter-spacing: 0.08em; text-transform: uppercase; z-index: 5;
+    }
+  </style>
+</head>
+<body class="demo-mode">
+  <div class="banner" id="banner">Demo…</div>
+  <div id="speedo" class="speedo" aria-hidden="true"></div>
+  <div id="demo" class="demo hidden"></div>
+  <script>window.GetParentResourceName = () => 'mallorca-speedometer';</script>
+  <script>
+    // Inject same HUD markup as index for auto-demo
+    fetch('index.html').then(r => r.text()).then(html => {
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      document.getElementById('speedo').outerHTML = doc.getElementById('speedo').outerHTML;
+      const s = document.createElement('script');
+      s.src = 'app.js';
+      s.onload = run;
+      document.body.appendChild(s);
+    });
+
+    const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+    const send = (data) => window.dispatchEvent(new MessageEvent('message', { data: { action: 'update', data } }));
+
+    async function run() {
+      const banner = document.getElementById('banner');
+      banner.textContent = 'Tank vol · 72%';
+      send({ speed: 67, maxSpeed: 1300, unit: 'km/h', engine: 'green', damage: 'green', fuel: 72, fuelState: 'green', left: false, right: false, hazard: false, handbrake: false, lights: true });
+      await sleep(1600);
+
+      banner.textContent = 'Tank daalt…';
+      for (let f = 72; f >= 28; f -= 4) {
+        send({ speed: 90, maxSpeed: 1300, unit: 'km/h', engine: 'green', damage: 'green', fuel: f, fuelState: f >= 40 ? 'green' : 'yellow', left: false, right: false, hazard: false, handbrake: false, lights: true });
+        await sleep(80);
+      }
+      await sleep(900);
+
+      banner.textContent = 'Tank bijna leeg · rood';
+      send({ speed: 40, maxSpeed: 1300, unit: 'km/h', engine: 'yellow', damage: 'green', fuel: 8, fuelState: 'red', left: false, right: true, hazard: false, handbrake: false, lights: true });
+      await sleep(1600);
+
+      banner.textContent = 'Alles actief';
+      send({ speed: 0, maxSpeed: 1300, unit: 'km/h', engine: 'red', damage: 'yellow', fuel: 8, fuelState: 'red', left: true, right: true, hazard: true, handbrake: true, lights: true });
+      await sleep(2200);
+      banner.textContent = 'Klaar';
+    }
+  </script>
+</body>
+</html>
