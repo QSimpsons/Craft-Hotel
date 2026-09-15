@@ -4,7 +4,7 @@ Complete FiveM voertuig-HUD.
 
 ## Snelle installatie
 
-1. Map `mallorca-speedometer` in `resources` zetten  
+1. Zip uitpakken en map `mallorca-speedometer` in `resources` zetten  
 2. `sql/install.sql` uitvoeren in je database  
 3. In `server.cfg`:
 

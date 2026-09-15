@@ -14,7 +14,7 @@ INHOUD
   └── html/ (UI)
 
 STAP 1 - RESOURCE
-  Zet de map "mallorca-speedometer" in je server resources folder.
+  Pak de zip uit. Zet de map "mallorca-speedometer" in je server resources folder.
   Voorbeeld: resources/[local]/mallorca-speedometer
 
 STAP 2 - SQL (eenmalig)
@@ -43,6 +43,7 @@ STAP 4 - TESTEN
 
 CONFIG
   Zie config.lua
+  - Config.MaxSpeed = 1300          -- HUD-boog (km/h)
   - Config.Fuel.UseDatabase = true/false
   - Config.Fuel.Resource = 'LegacyFuel' als je een fuel-script gebruikt
 
