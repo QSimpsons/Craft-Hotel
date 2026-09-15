@@ -1,0 +1,52 @@
+============================================================
+  MALLORCA SPEEDOMETER - INSTALLATIE
+============================================================
+
+INHOUD
+  mallorca-speedometer/
+  ├── fxmanifest.lua
+  ├── config.lua
+  ├── INSTALL.txt
+  ├── README.md
+  ├── sql/install.sql          <-- database
+  ├── client/main.lua
+  ├── server/main.lua
+  └── html/ (UI)
+
+STAP 1 - RESOURCE
+  Zet de map "mallorca-speedometer" in je server resources folder.
+  Voorbeeld: resources/[local]/mallorca-speedometer
+
+STAP 2 - SQL (eenmalig)
+  Open HeidiSQL / phpMyAdmin en voer uit:
+
+    sql/install.sql
+
+  Of handmatig:
+
+    ALTER TABLE `owned_vehicles`
+      ADD COLUMN `fuel` FLOAT NOT NULL DEFAULT 100.0;
+
+  (Als de kolom al bestaat: fout negeren)
+
+STAP 3 - SERVER.CFG
+  Zorg dat oxmysql (of mysql-async) al draait, daarna:
+
+    ensure oxmysql
+    ensure mallorca-speedometer
+
+STAP 4 - TESTEN
+  1. Join de server
+  2. Stap als bestuurder in een voertuig
+  3. Je ziet de HUD onderaan in het midden
+  4. Pijl links/rechts = pinkers, pijl omlaag = noodknippers
+
+CONFIG
+  Zie config.lua
+  - Config.Fuel.UseDatabase = true/false
+  - Config.Fuel.Resource = 'LegacyFuel' als je een fuel-script gebruikt
+
+BROWSER PREVIEW
+  Open html/index.html of html/voorbeeld.html zonder FiveM.
+
+============================================================
